@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ru.schegrov</groupId>
+    <artifactId>fxreminder</artifactId>
+    <version>2.0</version>
+    <!-- -SNAPSHOT-->
+    <packaging>jar</packaging>
+    <name>FXReminder</name>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc7</artifactId>
+            <version>12.1.0.2</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <outputDirectory>app</outputDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <generatedSourcesDirectory>app</generatedSourcesDirectory>
+                    <useIncrementalCompilation>false</useIncrementalCompilation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-jar-plugin</artifactId>-->
+                <!--<version>3.0.0</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<phase>compile</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>jar</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--&lt;!&ndash;<classifier>client</classifier>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<excludes>&ndash;&gt;-->
+                                <!--&lt;!&ndash;<exclude>**/*</exclude>&ndash;&gt;-->
+                            <!--&lt;!&ndash;</excludes>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<includes>&ndash;&gt;-->
+                                <!--&lt;!&ndash;<include>**/ru/**</include>&ndash;&gt;-->
+                            <!--&lt;!&ndash;</includes>&ndash;&gt;-->
+                            <!--<outputDirectory>${project.build.outputDirectory}/bin</outputDirectory>-->
+                            <!--<archive>-->
+                                <!--<addMavenDescriptor>false</addMavenDescriptor>-->
+                                <!--<manifest>-->
+                                    <!--<mainClass>ru.schegrov.App</mainClass>-->
+                                    <!--<addClasspath>true</addClasspath>-->
+                                    <!--<classpathLayoutType>custom</classpathLayoutType>-->
+                                    <!--<customClasspathLayout>-->
+                                        <!--../lib/$${artifact.artifactId}-$${artifact.version}.$${artifact.extension}-->
+                                    <!--</customClasspathLayout>-->
+                                <!--</manifest>-->
+                            <!--</archive>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                ${project.build.outputDirectory}/lib
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

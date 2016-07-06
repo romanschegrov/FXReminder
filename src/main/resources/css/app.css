@@ -1,0 +1,4 @@
+.root {
+  -fx-accent: #008337;
+  -fx-focus-color: derive(-fx-accent,-5%);
+}
