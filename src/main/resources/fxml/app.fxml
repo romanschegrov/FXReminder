@@ -10,8 +10,8 @@
       <SplitPane dividerPositions="0.35" BorderPane.alignment="CENTER">
             <Accordion>
               <panes>
-                <TitledPane text="%app.accordion.titledpane.signin.text" animated="false"/>
-                <TitledPane text="%app.accordion.titledpane.jobs.text" animated="false"/>
+                <TitledPane fx:id="signIn" text="%app.accordion.titledpane.signin.text"/>
+                <TitledPane fx:id="jobs" text="%app.accordion.titledpane.jobs.text"/>
               </panes>
             </Accordion>
 
