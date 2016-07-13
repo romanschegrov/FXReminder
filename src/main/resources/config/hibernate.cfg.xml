@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
+    <property name="connection.url">jdbc:oracle:thin:@rman.dkb.local:1521:RMAN</property>
+    <property name="connection.driver_class">oracle.jdbc.OracleDriver</property>
+    <!--<property name="hibernate.connection.username">RAMONHB</property>-->
+    <!--<property name="hibernate.connection.password">RAMONHB</property>-->
+    <property name="show_sql">false</property>
+    <property name="format_sql">false</property>
+    <property name="hbm2ddl.auto">update</property>
+
+    <!--<mapping class="habrahabr.model.Bus"/>-->
+    <!--<mapping class="habrahabr.model.Driver"/>-->
+    <!--<mapping class="habrahabr.model.Route"/>-->
+    <!--<mapping class="fromdbshema.TAutoBus"/>-->
+    <!--<mapping class="fromdbshema.TAutoRoute"/>-->
+  </session-factory>
+</hibernate-configuration>

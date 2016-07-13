@@ -1,11 +1,15 @@
 package ru.schegrov.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.TitledPane;
+import javafx.scene.text.Text;
 import org.apache.log4j.Logger;
 import ru.schegrov.model.AppModel;
+import ru.schegrov.util.HibernateHelper;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,6 +24,8 @@ public class AppController implements Initializable {
     private ResourceBundle resources;
 
     @FXML
+    private Accordion accordion;
+    @FXML
     private TitledPane signIn;
     @FXML
     private TitledPane jobs;
@@ -33,6 +39,9 @@ public class AppController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
         initSignController();
+        //...
+
+        accordion.setExpandedPane(signIn);
         logger.info("AppController initialized");
     }
 
@@ -45,5 +54,9 @@ public class AppController implements Initializable {
         } catch (IOException e) {
             logger.error("initSignController error", e);
         }
+    }
+
+    public void closeMenu(ActionEvent actionEvent) {
+        System.exit(0);
     }
 }

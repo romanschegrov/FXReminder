@@ -11,7 +11,7 @@
       fx:controller="ru.schegrov.controller.SignAccordionController">
    <children>
 
-       <Text text="Вход в систему">
+       <Text text="%app.accordion.titledpane.signin.title">
          <font>
             <Font name="Tahoma" size="20.0" />
          </font>
@@ -19,16 +19,18 @@
 
        <GridPane alignment="CENTER" hgap="5.0" vgap="10.0">
          <children>
-            <Label text="Label1" GridPane.rowIndex="1" />
-            <Label text="Label2" GridPane.rowIndex="2" />
+            <Label text="%app.accordion.titledpane.signin.label.username" GridPane.rowIndex="1" />
+             <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="2">
+                 <Label text="%app.accordion.titledpane.signin.label.password"/>
+             </HBox>
 
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="username" promptText="%app.accordion.titledpane.signin.text.prompt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="password" promptText="%app.accordion.titledpane.signin.text.prompt" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
              <HBox alignment="TOP_RIGHT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                <children>
-                  <Button mnemonicParsing="false" text="Button" />
-                  <Button mnemonicParsing="false" text="Button" />
+                  <Button fx:id="signin" text="%app.accordion.titledpane.signin.button.signin" onAction="#signin" />
+                  <Button fx:id="signout" text="%app.accordion.titledpane.signin.button.signout" onAction="#signout" />
                </children>
             </HBox>
          </children>
@@ -37,7 +39,9 @@
          </padding>
        </GridPane>
 
-       <Text fill="#b02323" text="error jlk jkjkljkjkkljkj kjlkj jkl jk jlkjkj kjljl kjl kjkjl jkj lj kj kjl jlkjlkj lkjlk jkjlkjl" wrappingWidth="250.0" />
+       <Text fx:id="url" fill="#4682B4" text="url"/>
+
+       <Text fx:id="logonerror" fill="#b02323" wrappingWidth="250.0" />
        
    </children>
 </VBox>

@@ -8,10 +8,10 @@
             xmlns:fx="http://javafx.com/fxml">
    <center>
       <SplitPane dividerPositions="0.35" BorderPane.alignment="CENTER">
-            <Accordion>
+            <Accordion fx:id="accordion">
               <panes>
-                <TitledPane fx:id="signIn" text="%app.accordion.titledpane.signin.text"/>
-                <TitledPane fx:id="jobs" text="%app.accordion.titledpane.jobs.text"/>
+                <TitledPane fx:id="signIn" text="%app.accordion.titledpane.signin.title"/>
+                <TitledPane fx:id="jobs" text="%app.accordion.titledpane.jobs.title"/>
               </panes>
             </Accordion>
 
@@ -29,7 +29,7 @@
    <top>
       <MenuBar>
           <Menu text="%app.menubar.menu.file.text">
-              <MenuItem text="%app.menubar.menu.file.item.close.text" />
+              <MenuItem text="%app.menubar.menu.file.item.close.text" onAction="#closeMenu" />
           </Menu>
           <Menu text="%app.menubar.menu.help.text">
               <MenuItem text="%app.menubar.menu.help.item.about.text" />
