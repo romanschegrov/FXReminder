@@ -27,7 +27,7 @@ public class HibernateHelper {
         } catch (HibernateException e) {
             logger.error("Init HibernateHelper error", e);
         }
-        logger.info("HibernateHelper init");
+        logger.info("init");
     }
 
     public static HibernateHelper getInstance() {

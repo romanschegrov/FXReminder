@@ -6,10 +6,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.TitledPane;
-import javafx.scene.text.Text;
+import javafx.util.Callback;
 import org.apache.log4j.Logger;
 import ru.schegrov.model.AppModel;
-import ru.schegrov.util.HibernateHelper;
 
 import java.io.IOException;
 import java.net.URL;
@@ -26,35 +25,46 @@ public class AppController implements Initializable {
     @FXML
     private Accordion accordion;
     @FXML
-    private TitledPane signIn;
+    private TitledPane sign;
     @FXML
     private TitledPane jobs;
 
     public AppController(AppModel model) {
         this.model = model;
-        logger.info("AppController init");
+        logger.info("init");
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
-        initSignController();
-        //...
+        initController("/fxml/sign.fxml", t -> new SignAccordionController(), sign);
+        initController("/fxml/jobs.fxml", t -> new JobsAccordionController(), jobs);
 
-        accordion.setExpandedPane(signIn);
-        logger.info("AppController initialized");
+        accordion.setExpandedPane(sign);
+        logger.info("initialized");
     }
 
-    private void initSignController() {
+    private void initController(String fxml, Callback<Class<?>, Object> controllerFactory, TitledPane pane) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/signin.fxml"));
+            loader = new FXMLLoader(getClass().getResource(fxml));
             loader.setResources(resources);
-            loader.setControllerFactory(t -> new SignAccordionController());
-            signIn.setContent(loader.load());
+            loader.setControllerFactory(controllerFactory);
+            pane.setContent(loader.load());
         } catch (IOException e) {
-            logger.error("initSignController error", e);
+            logger.error("initController error", e);
         }
     }
+
+//    private void initJobsController() {
+//        try {
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/jobs.fxml"));
+//            loader.setResources(resources);
+//            loader.setControllerFactory(t -> new SignAccordionController());
+//            jobs.setContent(loader.load());
+//        } catch (IOException e) {
+//            logger.error("initSignController error", e);
+//        }
+//    }
 
     public void closeMenu(ActionEvent actionEvent) {
         System.exit(0);

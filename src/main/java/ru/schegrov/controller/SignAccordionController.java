@@ -26,12 +26,13 @@ public class SignAccordionController implements Initializable {
 
 
     public SignAccordionController() {
-        logger.info("SignAccordionController init");
+        logger.info("init");
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         url.setText(HibernateHelper.getInstance().getUrl());
+        logger.info("initialized");
     }
 
     public void signin(ActionEvent actionEvent) {
