@@ -22,10 +22,8 @@ public class App extends Application {
     }
 
     public void start(Stage stage) throws Exception {
-        HibernateHelper hibernateHelper = HibernateHelper.getInstance();
-        //"RAMONHB", "RAMONHB"
-        logger.info(hibernateHelper.getUrl());
-        //hibernateHelper.getSessionFactory().close();
+
+        logger.info("start");
 
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config.locale"/*, new Locale("en")*/);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/app.fxml"));
@@ -35,5 +33,7 @@ public class App extends Application {
         stage.setScene(new Scene(loader.load()));
         stage.setTitle(resourceBundle.getString("app.title"));
         stage.show();
+
+        logger.info("end");
     }
 }

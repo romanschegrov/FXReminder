@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 
-<TreeView
-        stylesheets="/css/app.css"
-        xmlns="http://javafx.com/javafx/8"
-        xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="ru.schegrov.controller.JobsAccordionController"
-        fx:id="treeView">
+
+<TreeView fx:id="treeView" stylesheets="/css/app.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.schegrov.controller.JobsAccordionController">
+   <contextMenu>
+      <ContextMenu>
+          <items>
+              <MenuItem fx:id="refresh" text="Обновить" />
+              <SeparatorMenuItem/>
+              <MenuItem fx:id="add" text="Добавить" />
+              <MenuItem fx:id="del" text="Удалить" />
+          </items>
+      </ContextMenu>
+   </contextMenu>
 </TreeView>
