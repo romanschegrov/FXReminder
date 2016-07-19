@@ -6,10 +6,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
 
-/**
- * Created by ramon on 11.07.2016.
- */
 public class HibernateHelper {
 
     private static final Logger logger = Logger.getLogger(HibernateHelper.class);
@@ -32,21 +31,44 @@ public class HibernateHelper {
 
     public static HibernateHelper getInstance() {
         if (instance == null) {
-            return new HibernateHelper();
+            instance = new HibernateHelper();
         }
         return instance;
     }
 
-    public SessionFactory getSessionFactory(String username, String password) {
-        if (sessionFactory == null) {
-            configure.setProperty("hibernate.connection.username", username);
-            configure.setProperty("hibernate.connection.password", password);
+    public SessionFactory getSessionFactory () throws Exception{
+        if (sessionFactory == null || sessionFactory.isClosed()) {
 
-            this.sessionFactory = configure.buildSessionFactory();
-            this.username = username;
-            this.password = password;
+            if (username == null || username.isEmpty()) throw new Exception("username is empty");
+            if (password == null || password.isEmpty()) throw new Exception("password is empty");
+
+            try {
+                configure.setProperty("hibernate.connection.username", username);
+                configure.setProperty("hibernate.connection.password", password);
+
+                sessionFactory = configure.buildSessionFactory();
+            } catch (HibernateException e){
+                logger.error("buildSessionFactory error: ", e);
+                throw new HibernateException(e);
+            }
         }
         return sessionFactory;
+    }
+
+    public void closeSessionFactory(){
+        try {
+            sessionFactory.close();
+        } catch (Exception e) {
+            logger.error("closeSessionFactory error: ", e);
+        }
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getUrl(){

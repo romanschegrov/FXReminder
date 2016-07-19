@@ -41,7 +41,7 @@
 
        <Text fx:id="url" fill="#4682B4" text="url"/>
 
-       <Text fx:id="logonerror" fill="#b02323" wrappingWidth="250.0" />
+       <Text fx:id="error" fill="#b02323" wrappingWidth="250.0" />
        
    </children>
 </VBox>

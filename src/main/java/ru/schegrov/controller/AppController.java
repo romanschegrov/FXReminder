@@ -37,7 +37,7 @@ public class AppController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
-        initController("/fxml/sign.fxml", t -> new SignAccordionController(), sign);
+        initController("/fxml/sign.fxml", t -> new SignAccordionController(this), sign);
         initController("/fxml/jobs.fxml", t -> new JobsAccordionController(), jobs);
 
         accordion.setExpandedPane(sign);
@@ -53,6 +53,10 @@ public class AppController implements Initializable {
         } catch (IOException e) {
             logger.error("initController error", e);
         }
+    }
+
+    public void expandedJobsPane(){
+        accordion.setExpandedPane(jobs);
     }
 
 //    private void initJobsController() {
