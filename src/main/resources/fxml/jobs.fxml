@@ -10,8 +10,8 @@
           <items>
               <MenuItem fx:id="refresh" text="%app.accordion.titledpane.jobs.context.refresh" />
               <SeparatorMenuItem/>
-              <MenuItem fx:id="add" text="%app.accordion.titledpane.jobs.context.add" />
-              <MenuItem fx:id="del" text="%app.accordion.titledpane.jobs.context.del" />
+              <MenuItem fx:id="add" text="%app.accordion.titledpane.jobs.context.add" onAction="#addContextMenu" />
+              <MenuItem fx:id="del" text="%app.accordion.titledpane.jobs.context.del" onAction="#delContextMenu"/>
           </items>
       </ContextMenu>
    </contextMenu>

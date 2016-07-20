@@ -21,7 +21,6 @@ import java.util.ResourceBundle;
 
 public class SignAccordionController implements Initializable {
     private static final Logger logger = Logger.getLogger(SignAccordionController.class);
-    private SessionFactory sessionFactory;
     private AppController root;
 
     @FXML
@@ -44,36 +43,39 @@ public class SignAccordionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        url.setText(HibernateHelper.getInstance().getUrl());
+        logger.info("initialize");
+        url.setText(HibernateHelper.getUrl());
+        username.setText(HibernateHelper.getUsername());
+        password.setText(HibernateHelper.getPassword());
         signout.setDisable(true);
-        username.setText("RAMONHB");
         logger.info("initialized");
     }
 
     public void signin(ActionEvent actionEvent) {
         try {
-            HibernateHelper.getInstance().setUsername(username.getText());
-            HibernateHelper.getInstance().setPassword(password.getText());
-            HibernateHelper.getInstance().getSessionFactory();
-
+            HibernateHelper.getSessionFactory(username.getText(), password.getText());
             signin.setDisable(true);
             signout.setDisable(false);
+            error.setText(null);
             root.expandedJobsPane();
+            logger.info("Connected");
         } catch (Exception e) {
-            logger.error("Button signin error: ", e);
             while (e.getCause()!=null) e = (Exception) e.getCause();
             error.setText(e.getMessage());
             username.requestFocus();
+            logger.error("Button signin error: ", e);
         }
     }
 
     public void signout(ActionEvent actionEvent) {
         try {
+            HibernateHelper.closeSessionFactory();
             signin.setDisable(false);
             signout.setDisable(true);
+            logger.info("Disconnected");
         } catch (HibernateException e) {
-            logger.error("Button signout error: ", e);
             error.setText(e.getMessage());
+            logger.error("Button signout error: ", e);
         }
     }
 }

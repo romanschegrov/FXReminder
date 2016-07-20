@@ -36,7 +36,7 @@ public class App extends Application {
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/pic/title.png")));
         stage.setScene(new Scene(loader.load()));
         stage.setTitle(resourceBundle.getString("app.title"));
-        stage.setOnCloseRequest(event -> HibernateHelper.getInstance().closeSessionFactory());
+        stage.setOnCloseRequest(event -> HibernateHelper.closeSessionFactory());
         stage.show();
 
         logger.info("end");

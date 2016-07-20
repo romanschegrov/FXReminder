@@ -5,73 +5,80 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-
 public class HibernateHelper {
 
     private static final Logger logger = Logger.getLogger(HibernateHelper.class);
-    private static HibernateHelper instance;
-    private SessionFactory sessionFactory;
+    private static final String url;
+    private static final String username;
+    private static final String password;
+    private static final Configuration startConfigure;
+    private static SessionFactory sessionFactory;
 
-    private String username;
-    private String password;
-
-    private Configuration configure;
-
-    private HibernateHelper() {
+    static {
         try {
-            configure = new Configuration().configure("config/hibernate.cfg.xml");
-        } catch (HibernateException e) {
+            logger.info("start static block");
+            startConfigure = new Configuration().configure("config/hibernate.cfg.xml");
+            url = startConfigure.getProperty("connection.url");
+            username = startConfigure.getProperty("hibernate.connection.username");
+            password = startConfigure.getProperty("hibernate.connection.password");
+            logger.info("init static block");
+        } catch (Exception e) {
             logger.error("Init HibernateHelper error", e);
+            throw new HibernateException(e);
         }
-        logger.info("init");
     }
 
-    public static HibernateHelper getInstance() {
-        if (instance == null) {
-            instance = new HibernateHelper();
-        }
-        return instance;
-    }
+    private HibernateHelper() {}
 
-    public SessionFactory getSessionFactory () throws Exception{
-        if (sessionFactory == null || sessionFactory.isClosed()) {
+    public static SessionFactory getSessionFactory (String username, String password) throws Exception{
 
-            if (username == null || username.isEmpty()) throw new Exception("username is empty");
-            if (password == null || password.isEmpty()) throw new Exception("password is empty");
+        logger.info("start getSessionFactory");
 
-            try {
-                configure.setProperty("hibernate.connection.username", username);
-                configure.setProperty("hibernate.connection.password", password);
+        if (username == null || username.isEmpty()) throw new Exception("username is empty");
+        if (password == null || password.isEmpty()) throw new Exception("password is empty");
 
-                sessionFactory = configure.buildSessionFactory();
-            } catch (HibernateException e){
-                logger.error("buildSessionFactory error: ", e);
-                throw new HibernateException(e);
-            }
+        try {
+            Configuration configure = new Configuration().configure("config/hibernate.cfg.xml");
+            configure.setProperty("hibernate.connection.username", username);
+            configure.setProperty("hibernate.connection.password", password);
+            sessionFactory = configure.buildSessionFactory();
+        } catch (HibernateException e){
+            logger.error("buildSessionFactory error: ", e);
+            throw new Exception(e);
         }
         return sessionFactory;
     }
 
-    public void closeSessionFactory(){
-        try {
-            sessionFactory.close();
-        } catch (Exception e) {
-            logger.error("closeSessionFactory error: ", e);
+    public static SessionFactory getSessionFactory () throws Exception{
+        logger.info("start getSessionFactory");
+        if (sessionFactory == null || sessionFactory.isClosed()) {
+            Exception exception = new Exception("sessionFactory is null or closed");
+            logger.error("getSessionFactory error: ", exception);
+            throw exception;
+        }
+        return sessionFactory;
+    }
+
+    public static void closeSessionFactory(){
+        if (sessionFactory != null) {
+            try {
+                sessionFactory.close();
+                logger.info("closed SessionFactory");
+            } catch (Exception e) {
+                logger.error("closeSessionFactory error: ", e);
+            }
         }
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public static String getUrl(){
+        return url;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public static String getUsername() {
+        return username;
     }
 
-    public String getUrl(){
-        return configure.getProperty("connection.url");
+    public static String getPassword() {
+        return password;
     }
 }

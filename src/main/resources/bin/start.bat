@@ -19,7 +19,7 @@ set OPTS=%OPTS% -Dsun.io.useCanonCaches=false
 set OPTS=%OPTS% -Dlog4j.configuration=file:%APP_HOME%\config\log4j.properties
 
 set CLASSPATH=%APP_HOME%
-set CLASSPATH=%CLASSPATH%;%APP_LIB%\log4j-1.2.17.jar
+set CLASSPATH=%CLASSPATH%;%APP_LIB%\*
 
 cd /D %APP_HOME%
 rem "%JAVA_HOME%\bin\java" %OPTS% -classpath %CLASSPATH% ru.schegrov.App
