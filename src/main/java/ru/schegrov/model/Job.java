@@ -1,11 +1,10 @@
 package ru.schegrov.model;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "T_FXR_JOBS")
@@ -14,6 +13,14 @@ public class Job {
     private IntegerProperty id = new SimpleIntegerProperty();
     private IntegerProperty parent_id = new SimpleIntegerProperty();
     private StringProperty name = new SimpleStringProperty();
+    private BooleanProperty job = new SimpleBooleanProperty();
+
+//    @OneToMany(mappedBy = "id", fetch = FetchType.EAGER, targetEntity = Job.class)
+//    private List<Job> childrens = new ArrayList<>();
+//
+//    public List<Job> getChildrens() {
+//        return childrens;
+//    }
 
     public Job() {}
 
@@ -65,5 +72,17 @@ public class Job {
 
     public void setParent_id(int parent_id) {
         this.parent_id.set(parent_id);
+    }
+
+    public boolean isJob() {
+        return job.get();
+    }
+
+    public BooleanProperty jobProperty() {
+        return job;
+    }
+
+    public void setJob(boolean job) {
+        this.job.set(job);
     }
 }

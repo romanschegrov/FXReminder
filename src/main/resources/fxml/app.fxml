@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
 <BorderPane prefWidth="800.0"
             prefHeight="600.0"
             stylesheets="/css/app.css"
@@ -10,8 +13,54 @@
       <SplitPane dividerPositions="0.35" BorderPane.alignment="CENTER">
             <Accordion fx:id="accordion">
               <panes>
-                <TitledPane fx:id="sign" text="%app.accordion.titledpane.signin.title"/>
-                <TitledPane fx:id="jobs" text="%app.accordion.titledpane.jobs.title"/>
+                <TitledPane fx:id="sign" text="%app.accordion.titledpane.signin.title">
+                    <VBox alignment="CENTER">
+                        <children>
+                            <Text text="%app.accordion.titledpane.signin.title">
+                                <font>
+                                    <Font name="Tahoma" size="20.0" />
+                                </font>
+                            </Text>
+                            <GridPane alignment="CENTER" hgap="5.0" vgap="10.0">
+                                <children>
+                                    <Label text="%app.accordion.titledpane.signin.label.username" GridPane.rowIndex="1" />
+                                    <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="2">
+                                        <Label text="%app.accordion.titledpane.signin.label.password"/>
+                                    </HBox>
+                                    <TextField fx:id="username" promptText="%app.accordion.titledpane.signin.text.prompt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <TextField fx:id="password" promptText="%app.accordion.titledpane.signin.text.prompt" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <HBox alignment="TOP_RIGHT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                        <children>
+                                            <Button fx:id="signin" text="%app.accordion.titledpane.signin.button.signin" onAction="#signin"/>
+                                            <Button fx:id="signout" text="%app.accordion.titledpane.signin.button.signout" onAction="#signout"/>
+                                        </children>
+                                    </HBox>
+                                </children>
+                                <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </padding>
+                            </GridPane>
+                            <Text fx:id="url" fill="#4682B4" text="url"/>
+                            <Text fx:id="error" fill="#b02323" wrappingWidth="250.0" />
+                        </children>
+                    </VBox>
+                </TitledPane>
+
+                <TitledPane fx:id="jobs" text="%app.accordion.titledpane.jobs.title">
+                    <TreeView fx:id="treeView">
+                        <contextMenu>
+                            <ContextMenu>
+                                <items>
+                                    <MenuItem fx:id="refresh" text="%app.accordion.titledpane.jobs.context.refresh" />
+                                    <SeparatorMenuItem/>
+                                    <MenuItem fx:id="add" text="%app.accordion.titledpane.jobs.context.add" onAction="#addContextMenu" />
+                                    <MenuItem fx:id="del" text="%app.accordion.titledpane.jobs.context.del" onAction="#delContextMenu"/>
+                                </items>
+                            </ContextMenu>
+                        </contextMenu>
+                    </TreeView>
+                </TitledPane>
+
               </panes>
             </Accordion>
 
