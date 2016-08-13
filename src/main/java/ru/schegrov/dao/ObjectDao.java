@@ -1,21 +1,18 @@
 package ru.schegrov.dao;
 
-import com.sun.javafx.fxml.expression.Expression;
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import ru.schegrov.model.Job;
 import ru.schegrov.util.HibernateHelper;
 
 import java.util.List;
 
-public abstract class AbstractDao<T> implements GenericDao<T>  {
+public class ObjectDao<T> implements CrudDao<T>  {
 
-    private static final Logger logger = Logger.getLogger(AbstractDao.class);
+    private static final Logger logger = Logger.getLogger(ObjectDao.class);
     private Class<T> type;
 
-    public AbstractDao(Class<T> type) {
+    public ObjectDao(Class<T> type) {
         this.type = type;
     }
 

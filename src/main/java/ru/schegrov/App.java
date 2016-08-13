@@ -32,7 +32,7 @@ public class App extends Application {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config.locale", new Locale("en"));
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/app.fxml"));
         loader.setResources(resourceBundle);
-        loader.setControllerFactory(t -> new AppController(new AppModel(resourceBundle)));
+        loader.setControllerFactory(t -> new AppController());
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/pic/title.png")));
         stage.setScene(new Scene(loader.load()));
         stage.setTitle(resourceBundle.getString("app.title"));

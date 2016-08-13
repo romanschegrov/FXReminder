@@ -47,7 +47,7 @@
                 </TitledPane>
 
                 <TitledPane fx:id="jobs" text="%app.accordion.titledpane.jobs.title">
-                    <TreeView fx:id="treeView">
+                    <TreeView fx:id="tree">
                         <contextMenu>
                             <ContextMenu>
                                 <items>

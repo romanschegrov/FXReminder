@@ -1,9 +1,13 @@
 package ru.schegrov.model;
 
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Entity
@@ -14,13 +18,33 @@ public class Job {
     private IntegerProperty parent_id = new SimpleIntegerProperty();
     private StringProperty name = new SimpleStringProperty();
     private BooleanProperty job = new SimpleBooleanProperty();
+    private List<JobCondition> conditions = new ArrayList<>();
+    private ObservableList<JobTableRow>
+            rows = FXCollections.observableArrayList();
+    private ObservableList<TableColumn<JobTableRow,String>>
+            columns = FXCollections.observableArrayList();
 
-//    @OneToMany(mappedBy = "id", fetch = FetchType.EAGER, targetEntity = Job.class)
-//    private List<Job> childrens = new ArrayList<>();
-//
-//    public List<Job> getChildrens() {
-//        return childrens;
-//    }
+    public ObservableList<JobTableRow> getRows() {
+        return rows;
+    }
+
+    public ObservableList<TableColumn<JobTableRow, String>> getColumns() {
+        return columns;
+    }
+
+    public List<JobCondition> getConditions() {
+        return conditions;
+    }
+
+    public String getCondition(String code) {
+        for (Iterator<JobCondition> iterator = conditions.iterator(); iterator.hasNext(); ){
+            JobCondition jobCondition = iterator.next();
+            if (jobCondition.getCode().equals(code)) {
+                return jobCondition.getValue();
+            }
+        }
+        return null;
+    }
 
     public Job() {}
 

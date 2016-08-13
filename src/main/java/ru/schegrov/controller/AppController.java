@@ -6,17 +6,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
-import javafx.util.Callback;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
-import ru.schegrov.dao.GenericDao;
-import ru.schegrov.dao.JobDaoImpl;
+import ru.schegrov.dao.JobDao;
+import ru.schegrov.dao.ObjectDao;
 import ru.schegrov.model.AppModel;
 import ru.schegrov.model.Job;
 import ru.schegrov.util.AlertHelper;
 import ru.schegrov.util.HibernateHelper;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -27,6 +25,7 @@ public class AppController implements Initializable {
     private FXMLLoader loader;
     private AppModel model;
     private ResourceBundle resources;
+    private AlertHelper alertError;
 
     @FXML
     private Accordion accordion;
@@ -59,8 +58,12 @@ public class AppController implements Initializable {
     @FXML
     private MenuItem del;
 
-    public AppController(AppModel model) {
-        this.model = model;
+    public AppController() {
+        this.model = new AppModel(resources, treeView);
+
+        alertError = new AlertHelper(Alert.AlertType.ERROR);
+        alertError.setTitle("Внимание"); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Перенести в resources
+
         logger.info("init");
     }
 
@@ -113,13 +116,18 @@ public class AppController implements Initializable {
                 HibernateHelper.getSessionFactory(username.getText(), password.getText());
                 error.setText(null);
                 accordion.setExpandedPane(jobs);
-                model.fillTreeView(treeView);
+                model.fillTreeView();
                 logger.info("Connected");
             } catch (Exception e) {
                 while (e.getCause()!=null) e = (Exception) e.getCause();
                 error.setText(e.getMessage());
+                treeView.getRoot().getChildren().clear();
                 username.requestFocus();
                 logger.error("Button signin error: ", e);
+
+                alertError.setContentText("Ошибка при входе"); //Перенести в resources
+                alertError.setException(e);
+                alertError.show();
             }
         } else {
             try {
@@ -132,6 +140,10 @@ public class AppController implements Initializable {
             } catch (HibernateException e) {
                 error.setText(e.getMessage());
                 logger.error("Button signout error: ", e);
+
+                alertError.setContentText("Ошибка при выходе"); //Перенести в resources
+                alertError.setException(e);
+                alertError.show();
             }
         }
     }
@@ -148,17 +160,16 @@ public class AppController implements Initializable {
             newJob.setJob(false);
             newJob.setParent_id(selectedItem.getValue().getId());
             try {
-                GenericDao<Job> job = new JobDaoImpl();
+                ObjectDao<Job> job = new ObjectDao<>(Job.class);
                 job.add(newJob);
                 selectedItem.getChildren().add(new TreeItem(newJob, model.loadImage("/pic/folder.png")));
                 selectedItem.setExpanded(true);
             } catch (Exception e) {
                 logger.error("addContextMenu error: ", e);
-                AlertHelper alert = new AlertHelper(Alert.AlertType.ERROR);
-                alert.setTitle("Внимание"); //Перенести в resources
-                alert.setContentText("Ошибка при создании задания"); //Перенести в resources
-                alert.setException(e);
-                alert.show();
+
+                alertError.setContentText("Ошибка при создании задания"); //Перенести в resources
+                alertError.setException(e);
+                alertError.show();
             }
         }
     }
