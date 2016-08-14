@@ -4,6 +4,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.Node?>
 <BorderPane prefWidth="800.0"
             prefHeight="600.0"
             stylesheets="/css/app.css"
@@ -66,7 +67,9 @@
 
             <TabPane side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                <Tab text="%app.tabpane.tab.detail.text"/>
+                <Tab text="%app.tabpane.tab.detail.text">
+                    <TableView fx:id="table"/>
+                </Tab>
                 <Tab text="%app.tabpane.tab.properties.text"/>
                 <Tab text="%app.tabpane.tab.users.text"/>
                 <Tab text="%app.tabpane.tab.groups.text"/>

@@ -8,10 +8,10 @@ import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
-import ru.schegrov.dao.JobDao;
 import ru.schegrov.dao.ObjectDao;
 import ru.schegrov.model.AppModel;
 import ru.schegrov.model.Job;
+import ru.schegrov.model.JobTableRow;
 import ru.schegrov.util.AlertHelper;
 import ru.schegrov.util.HibernateHelper;
 
@@ -50,7 +50,7 @@ public class AppController implements Initializable {
     private TitledPane jobs;
 
     @FXML
-    private TreeView<Job> treeView;
+    private TreeView<Job> tree;
     @FXML
     private MenuItem refresh;
     @FXML
@@ -58,8 +58,10 @@ public class AppController implements Initializable {
     @FXML
     private MenuItem del;
 
+    @FXML
+    private TableView<JobTableRow> table;
+
     public AppController() {
-        this.model = new AppModel(resources, treeView);
 
         alertError = new AlertHelper(Alert.AlertType.ERROR);
         alertError.setTitle("Внимание"); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Перенести в resources
@@ -70,6 +72,12 @@ public class AppController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
+
+        table.setEditable(true);
+        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+
+        model = new AppModel(tree, table);
+        model.setResources(resources);
 
         //initController("/fxml/sign.fxml", t -> new SignAccordionController(this), sign);
         //initController("/fxml/jobs.fxml", t -> new JobsAccordionController(), jobs);
@@ -121,9 +129,9 @@ public class AppController implements Initializable {
             } catch (Exception e) {
                 while (e.getCause()!=null) e = (Exception) e.getCause();
                 error.setText(e.getMessage());
-                treeView.getRoot().getChildren().clear();
-                username.requestFocus();
                 logger.error("Button signin error: ", e);
+
+                username.requestFocus();
 
                 alertError.setContentText("Ошибка при входе"); //Перенести в resources
                 alertError.setException(e);
@@ -132,9 +140,9 @@ public class AppController implements Initializable {
         } else {
             try {
                 HibernateHelper.closeSessionFactory();
-                TreeItem<Job> root = treeView.getRoot();
-                if (root != null) {
-                    root.getChildren().clear();
+                if (tree.getRoot() != null) {
+                    tree.getRoot().getChildren().clear();
+                    tree.setRoot(null);
                 }
                 logger.info("Disconnected");
             } catch (HibernateException e) {
@@ -153,7 +161,7 @@ public class AppController implements Initializable {
     }
 
     public void addContextMenu(ActionEvent actionEvent) {
-        TreeItem<Job> selectedItem = treeView.getSelectionModel().getSelectedItem();
+        TreeItem<Job> selectedItem = tree.getSelectionModel().getSelectedItem();
         if (selectedItem != null && !selectedItem.getValue().isJob()) {
             Job newJob = new Job();
             newJob.setName("Новое задание"); //Перенести в resources

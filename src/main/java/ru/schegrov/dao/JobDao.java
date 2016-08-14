@@ -8,6 +8,7 @@ import ru.schegrov.model.Job;
 import ru.schegrov.util.HibernateHelper;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ramon on 20.07.2016.
@@ -20,9 +21,9 @@ public class JobDao extends ObjectDao<Job> {
         super(Job.class);
     }
 
-    public List getAllRows(String sql) {
+    public List<Map<String,Object>> getAllRows(String sql) {
         Session session = null;
-        List list = null;
+        List<Map<String,Object>> list = null;
         try {
             session = HibernateHelper.getSessionFactory().openSession();
             session.beginTransaction();

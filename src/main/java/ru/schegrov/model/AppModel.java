@@ -1,5 +1,7 @@
 package ru.schegrov.model;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -8,7 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 import org.apache.log4j.Logger;
 import ru.schegrov.dao.JobDao;
-import ru.schegrov.util.JobScheduledService;
+import ru.schegrov.util.JobScheduler;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -29,11 +31,12 @@ public class AppModel {
     private TableView<JobTableRow> table;
     private Executor executor;
 
-    public AppModel(ResourceBundle resources, TreeView<Job> tree) {
-
-        this.resources = resources;
+    public AppModel(TreeView<Job> tree, TableView<JobTableRow> table) {
         this.tree = tree;
-        this.executor = Executors.newFixedThreadPool(5,
+        this.table = table;
+        this.tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+                refreshTable(newValue.getValue()));
+        this.executor = Executors.newFixedThreadPool(1,
                 new ThreadFactory() {
                     @Override
                     public Thread newThread(Runnable r) {
@@ -43,21 +46,21 @@ public class AppModel {
                     }
                 });
 
-        logger.info("AppModel init!");
+        logger.info("init");
+    }
+
+    public void setResources(ResourceBundle resources) {
+        this.resources = resources;
     }
 
     public void fillTreeView(){
-
-        TreeItem<Job> rootItem = tree.getRoot();
-        if (rootItem != null) {
-            rootItem.getChildren().clear();
-        }
 
         Job rootJob = new Job();
         rootJob.setName(resources.getString("app.accordion.titledpane.jobs.root"));
         rootJob.setParent_id(0);
 
-        rootItem = new TreeItem<>(rootJob, loadImage("/pic/title16.png"));
+        TreeItem<Job> rootItem = new TreeItem<>(rootJob, loadImage("/pic/title16.png"));
+        rootItem.valueProperty().addListener((observable, oldJob, newJob) -> refreshTable(newJob));
         rootItem.setExpanded(true);
         tree.setRoot(rootItem);
         addChildren(rootItem);
@@ -68,16 +71,18 @@ public class AppModel {
         List<Job> jobs = dao.getAllByParentId(parent.getValue().getId());
         jobs.forEach(job -> {
             TreeItem<Job> child = new TreeItem<Job>(job);
+            child.valueProperty().addListener((observable, oldJob, newJob) -> refreshTable(newJob));
 
             if (job.isJob()) {
                 child.setGraphic(loadImage("/pic/document.png"));
 
-                job.getConditions().add(new JobCondition("SQL","select header_no, value_date as Дата, doc_type from dkb.trans_all where value_date>=trunc(sysdate)-30"));
+                //
+                job.getConditions().add(new JobCondition("SQL","select doc_type as Тип, header_no as \"Номер Транзакции\", value_date as Дата from dkb.trans_all where value_date>=trunc(sysdate)-"+((int)(Math.random()*40))));
                 job.getConditions().add(new JobCondition("TIMER","15"));
 //              (new JobCondition("SHOW","RAMONHD"));
 //              job.add(new JobCondition("ACCESS","RAMONHD"));
 
-                JobScheduledService service = new JobScheduledService(job);
+                JobScheduler service = new JobScheduler(job);
                 service.setExecutor(executor);
                 service.setPeriod(Duration.seconds(Double.valueOf(job.getCondition("TIMER"))));        //////seconds!!!!!!!!!!!!!!!
                 service.setOnRunning(event -> {
@@ -102,6 +107,23 @@ public class AppModel {
             parent.getChildren().add(child);
             addChildren(child);
         });
+    }
+
+    private void refreshTable(Job newJob){
+        if (newJob != null) {
+            if (!tree.getSelectionModel().isEmpty()) {
+
+                Job selectedJob = tree.getSelectionModel().getSelectedItem().getValue();
+
+                if (newJob.equals(selectedJob)) {
+                    table.getColumns().clear();
+                    table.getColumns().addAll(newJob.getColumns());
+
+                    table.setItems(newJob.getRows());
+
+                }
+            }
+        }
     }
 
     public void exit() {

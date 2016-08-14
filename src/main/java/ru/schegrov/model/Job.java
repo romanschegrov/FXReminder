@@ -18,20 +18,33 @@ public class Job {
     private IntegerProperty parent_id = new SimpleIntegerProperty();
     private StringProperty name = new SimpleStringProperty();
     private BooleanProperty job = new SimpleBooleanProperty();
+    private IntegerProperty count = new SimpleIntegerProperty();
     private List<JobCondition> conditions = new ArrayList<>();
     private ObservableList<JobTableRow>
             rows = FXCollections.observableArrayList();
-    private ObservableList<TableColumn<JobTableRow,String>>
+    private ObservableList<TableColumn<JobTableRow,Object>>
             columns = FXCollections.observableArrayList();
 
+    @Transient
+    public int getCount() {
+        return count.get();
+    }
+
+    public void setCount(int count) {
+        this.count.set(count);
+    }
+
+    @Transient
     public ObservableList<JobTableRow> getRows() {
         return rows;
     }
 
-    public ObservableList<TableColumn<JobTableRow, String>> getColumns() {
+    @Transient
+    public ObservableList<TableColumn<JobTableRow, Object>> getColumns() {
         return columns;
     }
 
+    @Transient
     public List<JobCondition> getConditions() {
         return conditions;
     }
@@ -50,7 +63,13 @@ public class Job {
 
     @Override
     public String toString() {
-        return name.get();
+        StringBuilder builder = new StringBuilder(name.get());
+        if (isJob()){
+            builder.append(" (");
+            builder.append(count.get());
+            builder.append(")");
+        }
+        return  builder.toString();
     }
 
     @Id
