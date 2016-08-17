@@ -1,7 +1,5 @@
 package ru.schegrov.model;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -12,6 +10,7 @@ import org.apache.log4j.Logger;
 import ru.schegrov.dao.JobDao;
 import ru.schegrov.util.JobScheduler;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executor;
@@ -28,15 +27,19 @@ public class AppModel {
     private ResourceBundle resources;
     private boolean littleImage = true;
     private TreeView<Job> tree;
-    private TableView<JobTableRow> table;
+    private TableView <JobTableRow> table;
     private Executor executor;
+    private List<JobScheduler> schedulers;
 
     public AppModel(TreeView<Job> tree, TableView<JobTableRow> table) {
         this.tree = tree;
         this.table = table;
-        this.tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                refreshTable(newValue.getValue()));
-        this.executor = Executors.newFixedThreadPool(1,
+        this.tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                refreshTable(newValue.getValue());
+            }
+        });
+        executor = Executors.newFixedThreadPool(2,
                 new ThreadFactory() {
                     @Override
                     public Thread newThread(Runnable r) {
@@ -45,7 +48,7 @@ public class AppModel {
                         return thread;
                     }
                 });
-
+        schedulers = new ArrayList<>();
         logger.info("init");
     }
 
@@ -60,7 +63,6 @@ public class AppModel {
         rootJob.setParent_id(0);
 
         TreeItem<Job> rootItem = new TreeItem<>(rootJob, loadImage("/pic/title16.png"));
-        rootItem.valueProperty().addListener((observable, oldJob, newJob) -> refreshTable(newJob));
         rootItem.setExpanded(true);
         tree.setRoot(rootItem);
         addChildren(rootItem);
@@ -69,20 +71,19 @@ public class AppModel {
     private void addChildren(TreeItem<Job> parent){
         JobDao dao = new JobDao();
         List<Job> jobs = dao.getAllByParentId(parent.getValue().getId());
-        jobs.forEach(job -> {
-            TreeItem<Job> child = new TreeItem<Job>(job);
-            child.valueProperty().addListener((observable, oldJob, newJob) -> refreshTable(newJob));
+
+        for (Job job : jobs){
+
+            TreeItem<Job> child = new TreeItem<>(job);
 
             if (job.isJob()) {
                 child.setGraphic(loadImage("/pic/document.png"));
 
-                //
-                job.getConditions().add(new JobCondition("SQL","select doc_type as Тип, header_no as \"Номер Транзакции\", value_date as Дата from dkb.trans_all where value_date>=trunc(sysdate)-"+((int)(Math.random()*40))));
+                job.getConditions().add(new JobCondition("SQL","select created \"Тип\", to_char(created,'dd-mm-yyyy') \"Транзакция\", to_date(to_char(created,'dd-mm-yyyy'),'dd-mm-yyyy') as \"Дата документа\" from dkb.trans_all where value_date>=trunc(sysdate)-60 and  rownum<=round(dbms_random.value*10)"));
                 job.getConditions().add(new JobCondition("TIMER","15"));
-//              (new JobCondition("SHOW","RAMONHD"));
-//              job.add(new JobCondition("ACCESS","RAMONHD"));
 
                 JobScheduler service = new JobScheduler(job);
+                schedulers.add(service);
                 service.setExecutor(executor);
                 service.setPeriod(Duration.seconds(Double.valueOf(job.getCondition("TIMER"))));        //////seconds!!!!!!!!!!!!!!!
                 service.setOnRunning(event -> {
@@ -90,15 +91,17 @@ public class AppModel {
                     child.setGraphic(loadImage("/pic/refresh.png"));
                 });
                 service.setOnSucceeded(event -> {
-                    logger.info("Succeeded job " + job.getName());
+                    Job onSucceededJob = (Job) event.getSource().getValue();
+                    logger.info("Succeeded job: " + onSucceededJob.getName() + ", Count row: "+ onSucceededJob.getRows().size());
                     child.setGraphic(loadImage("/pic/document.png"));
+                    refreshTable(onSucceededJob);
                 });
                 service.setOnFailed(event -> {
-                    logger.warn("Failed job " + job.getName(), event.getSource().getException());
+                    Job onFailedJob = (Job) event.getSource().getValue();
+                    logger.warn("Failed job " + onFailedJob.getName(), event.getSource().getException());
                     child.setGraphic(loadImage("/pic/warning.png"));
                 });
                 service.start();
-
             } else {
                 child.setGraphic(loadImage("/pic/folder.png"));
                 child.setExpanded(true);
@@ -106,24 +109,34 @@ public class AppModel {
 
             parent.getChildren().add(child);
             addChildren(child);
-        });
+        }
     }
 
     private void refreshTable(Job newJob){
+        logger.trace("refreshTable");
         if (newJob != null) {
             if (!tree.getSelectionModel().isEmpty()) {
 
                 Job selectedJob = tree.getSelectionModel().getSelectedItem().getValue();
+                logger.trace("selectedJob = " + selectedJob);
+                logger.trace("newJob = " + newJob);
 
                 if (newJob.equals(selectedJob)) {
+                    logger.trace("equals");
                     table.getColumns().clear();
                     table.getColumns().addAll(newJob.getColumns());
 
                     table.setItems(newJob.getRows());
-
+                    logger.trace("newJob.getRows() " + newJob.getRows().size());
+                } else {
+                    logger.trace("not equals");
                 }
             }
         }
+    }
+
+    public void cancelSchedulers(){
+        schedulers.forEach(jobScheduler -> jobScheduler.cancel());
     }
 
     public void exit() {

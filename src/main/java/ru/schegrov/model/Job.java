@@ -22,7 +22,7 @@ public class Job {
     private List<JobCondition> conditions = new ArrayList<>();
     private ObservableList<JobTableRow>
             rows = FXCollections.observableArrayList();
-    private ObservableList<TableColumn<JobTableRow,Object>>
+    private ObservableList <TableColumn<JobTableRow,String>>
             columns = FXCollections.observableArrayList();
 
     @Transient
@@ -40,7 +40,7 @@ public class Job {
     }
 
     @Transient
-    public ObservableList<TableColumn<JobTableRow, Object>> getColumns() {
+    public ObservableList<TableColumn <JobTableRow, String> > getColumns() {
         return columns;
     }
 
@@ -60,6 +60,31 @@ public class Job {
     }
 
     public Job() {}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Job job1 = (Job) o;
+
+        if (!id.equals(job1.id)) return false;
+        if (!parent_id.equals(job1.parent_id)) return false;
+        if (name != null ? !name.equals(job1.name) : job1.name != null) return false;
+        if (!job.equals(job1.job)) return false;
+        return conditions != null ? conditions.equals(job1.conditions) : job1.conditions == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + parent_id.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + job.hashCode();
+        result = 31 * result + (conditions != null ? conditions.hashCode() : 0);
+        return result;
+    }
 
     @Override
     public String toString() {

@@ -140,6 +140,9 @@ public class AppController implements Initializable {
         } else {
             try {
                 HibernateHelper.closeSessionFactory();
+                model.cancelSchedulers();
+                table.getColumns().clear();
+                table.getItems().clear();
                 if (tree.getRoot() != null) {
                     tree.getRoot().getChildren().clear();
                     tree.setRoot(null);
