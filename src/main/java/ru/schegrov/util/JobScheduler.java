@@ -8,8 +8,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import org.apache.log4j.Logger;
 import ru.schegrov.dao.JobDao;
-import ru.schegrov.model.Job;
-import ru.schegrov.model.JobTableRow;
+import ru.schegrov.entity.Job;
+import ru.schegrov.entity.JobTableRow;
 import java.sql.Timestamp;
 import java.util.*;
 

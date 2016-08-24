@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import ru.schegrov.model.Job;
+import ru.schegrov.entity.Job;
 import ru.schegrov.util.HibernateHelper;
 
 import java.util.List;

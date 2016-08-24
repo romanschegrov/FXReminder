@@ -1,4 +1,4 @@
-package ru.schegrov.model;
+package ru.schegrov.entity;
 
 import javafx.beans.property.SimpleStringProperty;
 

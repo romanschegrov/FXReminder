@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.geometry.Insets?>
+<?import ru.schegrov.entity.User?>
+<?import javafx.collections.FXCollections?>
+
+<VBox alignment="BOTTOM_CENTER"
+      stylesheets="/css/app.css"
+      xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ru.schegrov.controller.UsersTabController">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <Text text="%app.tabpane.tab.users.users">
+        <font>
+            <Font name="Tahoma" size="20.0" />
+        </font>
+    </Text>
+
+    <TableView fx:id="usersTableView" editable="true" VBox.vgrow="ALWAYS">
+        <columnResizePolicy>
+            <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+
+        <columns>
+            <TableColumn fx:id="code_id" text="%app.tabpane.tab.users.code">
+                <cellValueFactory>
+                    <PropertyValueFactory property="code"/>
+                </cellValueFactory>
+                <cellFactory>
+                    <TextFieldTableCell fx:factory="forTableColumn"/>
+                </cellFactory>
+            </TableColumn>
+            <TableColumn text="%app.tabpane.tab.users.descr">
+                <cellValueFactory>
+                    <PropertyValueFactory property="descr"/>
+                </cellValueFactory>
+                <cellFactory>
+                    <TextFieldTableCell fx:factory="forTableColumn"/>
+                </cellFactory>
+            </TableColumn>
+        </columns>
+
+        <items>
+            <FXCollections fx:factory="observableArrayList">
+                <User code="Jacob" descr="Smith"/>
+                <User code="Isabella" descr="Johnson"/>
+                <User code="Ethan" descr="Williams"/>
+                <User code="Emma" descr="Jones"/>
+                <User code="Michael" descr="Brown"/>
+            </FXCollections>
+        </items>
+
+        <sortOrder>
+            <fx:reference source="code_id"/>
+        </sortOrder>
+
+       <contextMenu>
+          <ContextMenu>
+              <items>
+                  <MenuItem fx:id="add" text="%app.tabpane.tab.users.menu.add" onAction="#addContextMenu" />
+                  <MenuItem fx:id="del" text="%app.tabpane.tab.users.menu.del" onAction="#delContextMenu"/>
+              </items>
+          </ContextMenu>
+       </contextMenu>
+    </TableView>
+
+    <Text text="%app.tabpane.tab.users.groups">
+        <font>
+            <Font name="Tahoma" size="20.0" />
+        </font>
+    </Text>
+
+    <TableView fx:id="groupsTableView" editable="false">
+        <columns>
+            <TableColumn text="%app.tabpane.tab.users.code">
+                <cellValueFactory>
+                    <PropertyValueFactory property="code"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="%app.tabpane.tab.users.descr">
+                <cellValueFactory>
+                    <PropertyValueFactory property="descr"/>
+                </cellValueFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+
+    <VBox alignment="BOTTOM_RIGHT">
+        <padding>
+            <Insets top="10" right="0" bottom="0" left="0"/>
+        </padding>
+        <Button text="%app.tabpane.tab.users.button.apply"/>
+    </VBox>
+</VBox>

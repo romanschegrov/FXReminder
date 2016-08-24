@@ -1,4 +1,4 @@
-package ru.schegrov.model;
+package ru.schegrov.entity;
 
 /**
  * Created by ramon on 10.08.2016.

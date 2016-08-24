@@ -13,7 +13,7 @@
     <property name="format_sql">false</property>
     <property name="hbm2ddl.auto">update</property>
 
-    <mapping class="ru.schegrov.model.Job"/>
+    <mapping class="ru.schegrov.entity.Job"/>
     <!--<mapping class="habrahabr.model.Driver"/>-->
     <!--<mapping class="habrahabr.model.Route"/>-->
     <!--<mapping class="fromdbshema.TAutoBus"/>-->

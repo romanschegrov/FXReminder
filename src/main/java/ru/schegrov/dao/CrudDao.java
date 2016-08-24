@@ -1,7 +1,5 @@
 package ru.schegrov.dao;
 
-import ru.schegrov.model.Job;
-
 import java.util.List;
 
 /**

@@ -4,17 +4,22 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
+import javafx.util.Callback;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import ru.schegrov.dao.ObjectDao;
 import ru.schegrov.model.AppModel;
-import ru.schegrov.model.Job;
-import ru.schegrov.model.JobTableRow;
+import ru.schegrov.entity.Job;
+import ru.schegrov.entity.JobTableRow;
 import ru.schegrov.util.AlertHelper;
 import ru.schegrov.util.HibernateHelper;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -61,6 +66,10 @@ public class AppController implements Initializable {
     @FXML
     private TableView<JobTableRow> table;
 
+    @FXML private TabPane tabPane;
+    @FXML private Tab tabUsers;
+    @FXML private Tab tabGroups;
+
     public AppController() {
 
         alertError = new AlertHelper(Alert.AlertType.ERROR);
@@ -73,14 +82,16 @@ public class AppController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
 
-        table.setEditable(true);
-        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        //вынес в fxml
+        //table.setEditable(true);
+        //table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
         model = new AppModel(tree, table);
         model.setResources(resources);
 
-        //initController("/fxml/sign.fxml", t -> new SignAccordionController(this), sign);
-        //initController("/fxml/jobs.fxml", t -> new JobsAccordionController(), jobs);
+        initController("/fxml/users.fxml", t -> new UsersTabController(), tabUsers);
+        initController("/fxml/groups.fxml", t -> new GroupsTabController(), tabGroups);
+
 
         accordion.setExpandedPane(sign);
 
@@ -96,16 +107,16 @@ public class AppController implements Initializable {
         logger.info("initialized");
     }
 
-//    private void initController(String fxml, Callback<Class<?>, Object> controllerFactory, TitledPane pane) {
-//        try {
-//            loader = new FXMLLoader(getClass().getResource(fxml));
-//            loader.setResources(resources);
-//            loader.setControllerFactory(controllerFactory);
-//            pane.setContent(loader.load());
-//        } catch (IOException e) {
-//            logger.error("initController error", e);
-//        }
-//    }
+    private void initController(String fxml, Callback<Class<?>, Object> controllerFactory, Tab pane) {
+        try {
+            loader = new FXMLLoader(getClass().getResource(fxml));
+            loader.setResources(resources);
+            loader.setControllerFactory(controllerFactory);
+            pane.setContent(loader.load());
+        } catch (IOException e) {
+            logger.error("initController error", e);
+        }
+    }
 
 
     public void signin(ActionEvent actionEvent) {

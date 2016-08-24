@@ -65,14 +65,29 @@
               </panes>
             </Accordion>
 
-            <TabPane side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
+            <TabPane fx:id="tabPane" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
               <tabs>
                 <Tab text="%app.tabpane.tab.detail.text">
-                    <TableView fx:id="table"/>
+                    <VBox alignment="BOTTOM_CENTER" >
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10"/>
+                        </padding>
+                        <Text text="%app.tabpane.tab.detail.label">
+                            <font>
+                                <Font name="Tahoma" size="20.0" />
+                            </font>
+                        </Text>
+
+                        <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">
+                            <columnResizePolicy>
+                                <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
+                            </columnResizePolicy>
+                        </TableView>
+                    </VBox>
                 </Tab>
-                <Tab text="%app.tabpane.tab.properties.text"/>
-                <Tab text="%app.tabpane.tab.users.text"/>
-                <Tab text="%app.tabpane.tab.groups.text"/>
+                <Tab fx:id="tabProperties" text="%app.tabpane.tab.properties.text"/>
+                <Tab fx:id="tabUsers" text="%app.tabpane.tab.users.text"/>
+                <Tab fx:id="tabGroups" text="%app.tabpane.tab.groups.text"/>
               </tabs>
             </TabPane>
       </SplitPane>

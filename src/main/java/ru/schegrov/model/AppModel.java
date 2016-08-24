@@ -8,6 +8,9 @@ import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 import org.apache.log4j.Logger;
 import ru.schegrov.dao.JobDao;
+import ru.schegrov.entity.Job;
+import ru.schegrov.entity.JobCondition;
+import ru.schegrov.entity.JobTableRow;
 import ru.schegrov.util.JobScheduler;
 
 import java.util.ArrayList;
