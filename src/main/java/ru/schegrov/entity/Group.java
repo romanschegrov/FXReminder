@@ -2,20 +2,28 @@ package ru.schegrov.entity;
 
 import javafx.beans.property.SimpleStringProperty;
 
+import javax.persistence.*;
+
 /**
  * Created by ramon on 24.08.2016.
  */
+@Entity
+@Table(name = "T_FXR_GROUP")
 public class Group {
     private SimpleStringProperty code = new SimpleStringProperty("");
     private SimpleStringProperty descr = new SimpleStringProperty("");
 
     public Group() {}
 
-    public Group(SimpleStringProperty code, SimpleStringProperty descr) {
-        this.code = code;
-        this.descr = descr;
-    }
-
+    @Id
+    @TableGenerator(
+            name = "GEN",
+            table = "T_FXR_SEQ",
+            pkColumnName = "NAME",
+            pkColumnValue = "GROUPS",
+            valueColumnName = "NUM",
+            allocationSize = 1)
+    @GeneratedValue(generator = "GEN")
     public String getCode() {
         return code.get();
     }

@@ -1,20 +1,42 @@
 package ru.schegrov.entity;
 
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
+
+import javax.persistence.*;
 
 /**
  * Created by ramon on 22.08.2016.
  */
+@Entity
+@Table(name = "T_FXR_USERS")
 public class User {
 
+    private SimpleIntegerProperty id = new SimpleIntegerProperty();
     private SimpleStringProperty code = new SimpleStringProperty("");
     private SimpleStringProperty descr = new SimpleStringProperty("");
+    private SimpleBooleanProperty admin = new SimpleBooleanProperty(false);
 
     public User() {}
 
-    public User(SimpleStringProperty code, SimpleStringProperty descr) {
-        this.code = code;
-        this.descr = descr;
+    @Id
+    @TableGenerator(
+            name = "GEN",
+            table = "T_FXR_SEQ",
+            pkColumnName = "NAME",
+            pkColumnValue = "USERS",
+            valueColumnName = "NUM",
+            allocationSize = 1)
+    @GeneratedValue(generator = "GEN")
+    public int getId() {
+        return id.get();
+    }
+
+    public SimpleIntegerProperty idProperty() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id.set(id);
     }
 
     public String getCode() {
@@ -39,5 +61,42 @@ public class User {
 
     public void setDescr(String descr) {
         this.descr.set(descr);
+    }
+
+    public boolean getAdmin() {
+        return admin.get();
+    }
+
+    public SimpleBooleanProperty adminProperty() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin.set(admin);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        return code.equals(user.code);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return code.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "code=" + code.get() +
+                ", descr=" + descr.get() +
+                ", admin=" + admin.get() +
+                '}';
     }
 }

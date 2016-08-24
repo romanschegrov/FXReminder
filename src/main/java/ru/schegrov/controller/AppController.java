@@ -32,48 +32,32 @@ public class AppController implements Initializable {
     private ResourceBundle resources;
     private AlertHelper alertError;
 
-    @FXML
-    private Accordion accordion;
+    @FXML private Accordion accordion;
+    @FXML private TitledPane sign;
+    @FXML private Text url;
+    @FXML private Text error;
+    @FXML private Button signin;
+    @FXML private Button signout;
+    @FXML private TextField username;
+    @FXML private TextField password;
 
-    @FXML
-    private TitledPane sign;
-    @FXML
-    private Text url;
-    @FXML
-    private Text error;
-    @FXML
-    private Button signin;
-    @FXML
-    private Button signout;
-    @FXML
-    private TextField username;
-    @FXML
-    private TextField password;
-
-
-    @FXML
-    private TitledPane jobs;
-
-    @FXML
-    private TreeView<Job> tree;
-    @FXML
-    private MenuItem refresh;
-    @FXML
-    private MenuItem add;
-    @FXML
-    private MenuItem del;
-
-    @FXML
-    private TableView<JobTableRow> table;
+    @FXML private TitledPane jobs;
+    @FXML private TreeView<Job> tree;
+    @FXML private MenuItem refresh;
+    @FXML private MenuItem add;
+    @FXML private MenuItem del;
 
     @FXML private TabPane tabPane;
+    @FXML private Tab tabDetail;
+    @FXML private TableView<JobTableRow> table;
+    @FXML private Tab tabProperties;
     @FXML private Tab tabUsers;
     @FXML private Tab tabGroups;
 
     public AppController() {
 
         alertError = new AlertHelper(Alert.AlertType.ERROR);
-        alertError.setTitle("Внимание"); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Перенести в resources
+        alertError.setTitle(resources.getString("app.alert.title"));
 
         logger.info("init");
     }
@@ -82,16 +66,11 @@ public class AppController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
 
-        //вынес в fxml
-        //table.setEditable(true);
-        //table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-
         model = new AppModel(tree, table);
         model.setResources(resources);
 
         initController("/fxml/users.fxml", t -> new UsersTabController(), tabUsers);
         initController("/fxml/groups.fxml", t -> new GroupsTabController(), tabGroups);
-
 
         accordion.setExpandedPane(sign);
 
@@ -118,7 +97,6 @@ public class AppController implements Initializable {
         }
     }
 
-
     public void signin(ActionEvent actionEvent) {
         signAction(true);
     }
@@ -136,6 +114,9 @@ public class AppController implements Initializable {
                 error.setText(null);
                 accordion.setExpandedPane(jobs);
                 model.fillTreeView();
+                tabProperties.setDisable(false);
+                tabUsers.setDisable(false);
+                tabGroups.setDisable(false);
                 logger.info("Connected");
             } catch (Exception e) {
                 while (e.getCause()!=null) e = (Exception) e.getCause();
@@ -144,7 +125,7 @@ public class AppController implements Initializable {
 
                 username.requestFocus();
 
-                alertError.setContentText("Ошибка при входе"); //Перенести в resources
+                alertError.setContentText(resources.getString("app.alert.sign.in"));
                 alertError.setException(e);
                 alertError.show();
             }
@@ -163,7 +144,7 @@ public class AppController implements Initializable {
                 error.setText(e.getMessage());
                 logger.error("Button signout error: ", e);
 
-                alertError.setContentText("Ошибка при выходе"); //Перенести в resources
+                alertError.setContentText(resources.getString("app.alert.sign.out"));
                 alertError.setException(e);
                 alertError.show();
             }
@@ -178,7 +159,7 @@ public class AppController implements Initializable {
         TreeItem<Job> selectedItem = tree.getSelectionModel().getSelectedItem();
         if (selectedItem != null && !selectedItem.getValue().isJob()) {
             Job newJob = new Job();
-            newJob.setName("Новое задание"); //Перенести в resources
+            newJob.setName(resources.getString("app.accordion.titledpane.jobs.new"));
             newJob.setJob(false);
             newJob.setParent_id(selectedItem.getValue().getId());
             try {
@@ -189,7 +170,7 @@ public class AppController implements Initializable {
             } catch (Exception e) {
                 logger.error("addContextMenu error: ", e);
 
-                alertError.setContentText("Ошибка при создании задания"); //Перенести в resources
+                alertError.setContentText(resources.getString("app.alert.jobs.add"));
                 alertError.setException(e);
                 alertError.show();
             }
@@ -197,5 +178,8 @@ public class AppController implements Initializable {
     }
 
     public void delContextMenu(ActionEvent actionEvent) {
+        alertError.setContentText(resources.getString("app.alert.jobs.del"));
+//        alertError.setException(e);
+        alertError.show();
     }
 }

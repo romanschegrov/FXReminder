@@ -11,6 +11,7 @@ public class ObjectDao<T> implements CrudDao<T>  {
 
     private static final Logger logger = Logger.getLogger(ObjectDao.class);
     private Class<T> type;
+    private enum Action {ADD, UPDATE, DELETE};
 
     public ObjectDao(Class<T> type) {
         this.type = type;
@@ -18,11 +19,37 @@ public class ObjectDao<T> implements CrudDao<T>  {
 
     @Override
     public void add(T obj) {
+        action(obj, Action.ADD);
+    }
+
+    @Override
+    public void update(T obj) throws Exception {
+        action(obj, Action.UPDATE);
+    }
+
+    @Override
+    public void delete(T obj) throws Exception {
+        action(obj, Action.DELETE);
+    }
+
+    private void action(T obj, Action action){
         Session session = null;
         try {
             session = HibernateHelper.getSessionFactory().openSession();
             session.beginTransaction();
-            session.save(obj);
+            switch (action){
+                case ADD:
+                    session.save(obj);
+                    break;
+                case UPDATE:
+                    session.update(obj);
+                    break;
+                case DELETE:
+                    session.delete(obj);
+                    break;
+                default:
+                    break;
+            }
             session.getTransaction().commit();
             logger.info("commit");
         } catch (Exception e){

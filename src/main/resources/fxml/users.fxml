@@ -7,6 +7,7 @@
 <?import javafx.scene.control.cell.*?>
 <?import javafx.geometry.Insets?>
 <?import ru.schegrov.entity.User?>
+<?import ru.schegrov.util.*?>
 <?import javafx.collections.FXCollections?>
 
 <VBox alignment="BOTTOM_CENTER"
@@ -31,7 +32,7 @@
         </columnResizePolicy>
 
         <columns>
-            <TableColumn fx:id="code_id" text="%app.tabpane.tab.users.code">
+            <TableColumn fx:id="code" text="%app.tabpane.tab.users.code">
                 <cellValueFactory>
                     <PropertyValueFactory property="code"/>
                 </cellValueFactory>
@@ -39,7 +40,7 @@
                     <TextFieldTableCell fx:factory="forTableColumn"/>
                 </cellFactory>
             </TableColumn>
-            <TableColumn text="%app.tabpane.tab.users.descr">
+            <TableColumn fx:id="descr" text="%app.tabpane.tab.users.descr">
                 <cellValueFactory>
                     <PropertyValueFactory property="descr"/>
                 </cellValueFactory>
@@ -60,7 +61,7 @@
         </items>
 
         <sortOrder>
-            <fx:reference source="code_id"/>
+            <fx:reference source="code"/>
         </sortOrder>
 
        <contextMenu>

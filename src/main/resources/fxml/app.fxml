@@ -67,7 +67,7 @@
 
             <TabPane fx:id="tabPane" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                <Tab text="%app.tabpane.tab.detail.text">
+                <Tab fx:id="tabDetail" text="%app.tabpane.tab.detail.text">
                     <VBox alignment="BOTTOM_CENTER" >
                         <padding>
                             <Insets top="10" right="10" bottom="10" left="10"/>
@@ -85,9 +85,9 @@
                         </TableView>
                     </VBox>
                 </Tab>
-                <Tab fx:id="tabProperties" text="%app.tabpane.tab.properties.text"/>
-                <Tab fx:id="tabUsers" text="%app.tabpane.tab.users.text"/>
-                <Tab fx:id="tabGroups" text="%app.tabpane.tab.groups.text"/>
+                <Tab fx:id="tabProperties" text="%app.tabpane.tab.properties.text" disable="true"/>
+                <Tab fx:id="tabUsers" text="%app.tabpane.tab.users.text" disable="true"/>
+                <Tab fx:id="tabGroups" text="%app.tabpane.tab.groups.text" disable="true"/>
               </tabs>
             </TabPane>
       </SplitPane>

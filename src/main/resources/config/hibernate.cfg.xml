@@ -14,9 +14,6 @@
     <property name="hbm2ddl.auto">update</property>
 
     <mapping class="ru.schegrov.entity.Job"/>
-    <!--<mapping class="habrahabr.model.Driver"/>-->
-    <!--<mapping class="habrahabr.model.Route"/>-->
-    <!--<mapping class="fromdbshema.TAutoBus"/>-->
-    <!--<mapping class="fromdbshema.TAutoRoute"/>-->
+    <mapping class="ru.schegrov.entity.User"/>
   </session-factory>
 </hibernate-configuration>
