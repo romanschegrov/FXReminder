@@ -18,7 +18,7 @@ public class ObjectDao<T> implements CrudDao<T>  {
     }
 
     @Override
-    public void add(T obj) {
+    public void add(T obj) throws Exception {
         action(obj, Action.ADD);
     }
 
@@ -32,7 +32,7 @@ public class ObjectDao<T> implements CrudDao<T>  {
         action(obj, Action.DELETE);
     }
 
-    private void action(T obj, Action action){
+    private void action(T obj, Action action) throws Exception {
         Session session = null;
         try {
             session = HibernateHelper.getSessionFactory().openSession();
@@ -55,6 +55,8 @@ public class ObjectDao<T> implements CrudDao<T>  {
         } catch (Exception e){
             session.getTransaction().rollback();
             logger.error("rollback", e);
+            while (e.getCause() != null) e = (Exception) e.getCause();
+            throw new Exception(e.getMessage());
         } finally {
             if (session != null && session.isOpen()){
                 session.close();

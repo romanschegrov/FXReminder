@@ -1,5 +1,6 @@
 package ru.schegrov.controller;
 
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -11,6 +12,7 @@ import ru.schegrov.dao.ObjectDao;
 import ru.schegrov.entity.User;
 import ru.schegrov.util.AlertHelper;
 import ru.schegrov.util.BooleanStringConverter;
+import ru.schegrov.util.HibernateHelper;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -33,7 +35,7 @@ public class UsersTabController implements Initializable {
             user.setCode(resources.getString("app.tabpane.tab.users.new"));
             ObjectDao<User> dao = new ObjectDao<>(User.class);
             dao.add(user);
-            usersTableView.getItems().add(user);
+            HibernateHelper.getAllUsers().add(user);
             usersTableView.getSelectionModel().selectLast();
         } catch (Exception e) {
             alertError.setContentText(resources.getString("app.alert.users.add"));
@@ -44,11 +46,17 @@ public class UsersTabController implements Initializable {
 
     public void delContextMenu(ActionEvent actionEvent) {
         User user = usersTableView.getSelectionModel().getSelectedItem();
+        int index = usersTableView.getSelectionModel().getSelectedIndex();
         if (user != null) {
             try {
                 ObjectDao<User> dao = new ObjectDao<>(User.class);
                 dao.delete(user);
-                usersTableView.getItems().remove(user);
+                HibernateHelper.getAllUsers().remove(user);
+                if (index == 0) {
+                    usersTableView.getSelectionModel().selectFirst();
+                } else {
+                    usersTableView.getSelectionModel().select(index-1);
+                }
             } catch (Exception e) {
                 alertError.setContentText(resources.getString("app.alert.users.del"));
                 alertError.setException(e);
@@ -60,6 +68,12 @@ public class UsersTabController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
+
+        HibernateHelper.getAllUsers().addListener((ListChangeListener<User>) c -> {
+            usersTableView.getItems().clear();
+            usersTableView.getItems().addAll(c.getList());
+        });
+
         alertError = new AlertHelper(Alert.AlertType.ERROR);
         alertError.setTitle(resources.getString("app.alert.title"));
         code.setOnEditCommit(event -> {

@@ -8,7 +8,7 @@ import javax.persistence.*;
  * Created by ramon on 22.08.2016.
  */
 @Entity
-@Table(name = "T_FXR_USERS")
+@Table(name = "T_FXR_USERS", uniqueConstraints = {@UniqueConstraint(name = "T_FXR_USERS_UK1", columnNames = {"CODE"})})
 public class User {
 
     private SimpleIntegerProperty id = new SimpleIntegerProperty();
@@ -17,6 +17,11 @@ public class User {
     private SimpleBooleanProperty admin = new SimpleBooleanProperty(false);
 
     public User() {}
+
+
+    public User(String code) {
+        this.code.set(code);
+    }
 
     @Id
     @TableGenerator(
@@ -79,24 +84,12 @@ public class User {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         User user = (User) o;
-
         return code.equals(user.code);
-
     }
 
     @Override
     public int hashCode() {
         return code.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "code=" + code.get() +
-                ", descr=" + descr.get() +
-                ", admin=" + admin.get() +
-                '}';
     }
 }

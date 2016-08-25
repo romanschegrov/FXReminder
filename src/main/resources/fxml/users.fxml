@@ -55,15 +55,15 @@
             </TableColumn>
         </columns>
 
-        <items>
-            <FXCollections fx:factory="observableArrayList">
-                <User code="Jacob" descr="Smith"/>
-                <User code="Isabella" descr="Johnson"/>
-                <User code="Ethan" descr="Williams"/>
-                <User code="Emma" descr="Jones"/>
-                <User code="Michael" descr="Brown"/>
-            </FXCollections>
-        </items>
+        <!--<items>-->
+            <!--<FXCollections fx:factory="observableArrayList">-->
+                <!--<User code="Jacob" descr="Smith"/>-->
+                <!--<User code="Isabella" descr="Johnson"/>-->
+                <!--<User code="Ethan" descr="Williams"/>-->
+                <!--<User code="Emma" descr="Jones"/>-->
+                <!--<User code="Michael" descr="Brown"/>-->
+            <!--</FXCollections>-->
+        <!--</items>-->
 
         <sortOrder>
             <fx:reference source="code"/>

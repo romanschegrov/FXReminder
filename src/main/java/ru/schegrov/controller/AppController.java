@@ -4,10 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import org.apache.log4j.Logger;
@@ -114,20 +111,17 @@ public class AppController implements Initializable {
                 error.setText(null);
                 accordion.setExpandedPane(jobs);
                 model.fillTreeView();
-                tabProperties.setDisable(false);
-                tabUsers.setDisable(false);
-                tabGroups.setDisable(false);
+                if (HibernateHelper.getConnectedUser().getAdmin()) {
+                    tabProperties.setDisable(false);
+                    tabUsers.setDisable(false);
+                    tabGroups.setDisable(false);
+                }
                 logger.info("Connected");
             } catch (Exception e) {
                 while (e.getCause()!=null) e = (Exception) e.getCause();
                 error.setText(e.getMessage());
                 logger.error("Button signin error: ", e);
-
                 username.requestFocus();
-
-                alertError.setContentText(resources.getString("app.alert.sign.in"));
-                alertError.setException(e);
-                alertError.show();
             }
         } else {
             try {
@@ -143,10 +137,6 @@ public class AppController implements Initializable {
             } catch (HibernateException e) {
                 error.setText(e.getMessage());
                 logger.error("Button signout error: ", e);
-
-                alertError.setContentText(resources.getString("app.alert.sign.out"));
-                alertError.setException(e);
-                alertError.show();
             }
         }
     }

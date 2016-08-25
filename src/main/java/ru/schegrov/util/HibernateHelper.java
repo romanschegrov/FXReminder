@@ -1,9 +1,18 @@
 package ru.schegrov.util;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import ru.schegrov.dao.JobDao;
+import ru.schegrov.dao.ObjectDao;
+import ru.schegrov.dao.UserDao;
+import ru.schegrov.entity.Group;
+import ru.schegrov.entity.User;
+
+import java.util.List;
 
 public class HibernateHelper {
 
@@ -13,6 +22,9 @@ public class HibernateHelper {
     private static final String password;
     private static final Configuration startConfigure;
     private static SessionFactory sessionFactory;
+    private static User connectedUser;
+    private static ObservableList<User> allUsers = FXCollections.observableArrayList();
+    private static ObservableList<Group> allGroups = FXCollections.observableArrayList();
 
     static {
         try {
@@ -34,19 +46,39 @@ public class HibernateHelper {
 
         logger.info("start getSessionFactory");
 
-        if (username == null || username.isEmpty()) throw new Exception("username is empty");
-        if (password == null || password.isEmpty()) throw new Exception("password is empty");
+        if (username == null || username.isEmpty()) throw new Exception("username is empty");            ///!!!!!!!!!!!!!!!!!!!!
+        if (password == null || password.isEmpty()) throw new Exception("password is empty");            ///////////////////////
 
         try {
             Configuration configure = new Configuration().configure("config/hibernate.cfg.xml");
             configure.setProperty("hibernate.connection.username", username);
             configure.setProperty("hibernate.connection.password", password);
             sessionFactory = configure.buildSessionFactory();
-        } catch (HibernateException e){
+
+            UserDao dao = new UserDao();
+            connectedUser = dao.getUserByUsername(username);
+            if (connectedUser == null) throw new Exception("Пользователь не зарегистрирован в системе");
+            if (connectedUser.getAdmin()){
+                fillAllUsers();
+                fillAllGroups();
+            }
+        } catch (/*Hibernate*/ Exception e){
             logger.error("buildSessionFactory error: ", e);
             throw new Exception(e);
         }
         return sessionFactory;
+    }
+
+    private static void fillAllUsers() throws Exception {
+        ObjectDao<User> dao = new ObjectDao<>(User.class);
+        List<User> list = dao.getAll();
+        list.forEach(user -> allUsers.add(user));
+    }
+
+    private static void fillAllGroups() throws Exception {
+        ObjectDao<Group> dao = new ObjectDao<>(Group.class);
+        List<Group> list = dao.getAll();
+        list.forEach(group -> allGroups.add(group));
     }
 
     public static SessionFactory getSessionFactory () throws Exception{
@@ -80,5 +112,17 @@ public class HibernateHelper {
 
     public static String getPassword() {
         return password;
+    }
+
+    public static User getConnectedUser() {
+        return connectedUser;
+    }
+
+    public static ObservableList<User> getAllUsers() {
+        return allUsers;
+    }
+
+    public static ObservableList<Group> getAllGroups() {
+        return allGroups;
     }
 }
