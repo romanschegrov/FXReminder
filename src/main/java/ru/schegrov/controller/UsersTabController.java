@@ -1,15 +1,16 @@
 package ru.schegrov.controller;
 
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.ChoiceBoxTableCell;
 import ru.schegrov.dao.ObjectDao;
 import ru.schegrov.entity.User;
 import ru.schegrov.util.AlertHelper;
+import ru.schegrov.util.BooleanStringConverter;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -24,10 +25,12 @@ public class UsersTabController implements Initializable {
     @FXML private TableView<User> usersTableView;
     @FXML private TableColumn<User,String> code;
     @FXML private TableColumn<User,String> descr;
+    @FXML private TableColumn<User,Boolean> admin;
 
     public void addContextMenu(ActionEvent actionEvent) {
         try {
             User user = new User();
+            user.setCode(resources.getString("app.tabpane.tab.users.new"));
             ObjectDao<User> dao = new ObjectDao<>(User.class);
             dao.add(user);
             usersTableView.getItems().add(user);
@@ -65,6 +68,12 @@ public class UsersTabController implements Initializable {
         });
         descr.setOnEditCommit(event -> {
             event.getRowValue().setDescr(event.getNewValue());
+            edit(event.getRowValue());
+        });
+        BooleanStringConverter converter  = new BooleanStringConverter(resources);
+        admin.setCellFactory(ChoiceBoxTableCell.forTableColumn(converter, true, false));
+        admin.setOnEditCommit(event -> {
+            event.getRowValue().setAdmin(event.getNewValue());
             edit(event.getRowValue());
         });
     }

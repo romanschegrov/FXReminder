@@ -57,14 +57,14 @@ public class AppController implements Initializable {
     public AppController() {
 
         alertError = new AlertHelper(Alert.AlertType.ERROR);
-        alertError.setTitle(resources.getString("app.alert.title"));
-
         logger.info("init");
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
+
+        alertError.setTitle(resources.getString("app.alert.title"));
 
         model = new AppModel(tree, table);
         model.setResources(resources);

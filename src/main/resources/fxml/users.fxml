@@ -48,6 +48,11 @@
                     <TextFieldTableCell fx:factory="forTableColumn"/>
                 </cellFactory>
             </TableColumn>
+            <TableColumn fx:id="admin" text="%app.tabpane.tab.users.admin">
+                <cellValueFactory>
+                    <PropertyValueFactory property="admin"/>
+                </cellValueFactory>
+            </TableColumn>
         </columns>
 
         <items>
