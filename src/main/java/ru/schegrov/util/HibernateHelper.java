@@ -42,12 +42,12 @@ public class HibernateHelper {
 
     private HibernateHelper() {}
 
-    public static SessionFactory getSessionFactory (String username, String password) throws Exception{
+    public static SessionFactory getSessionFactory (String username, String password) throws Exception {
 
         logger.info("start getSessionFactory");
 
-        if (username == null || username.isEmpty()) throw new Exception("username is empty");            ///!!!!!!!!!!!!!!!!!!!!
-        if (password == null || password.isEmpty()) throw new Exception("password is empty");            ///////////////////////
+        if (username == null || username.isEmpty()) throw new Exception("username is empty");            ///!!!!!!!!!!!!
+        if (password == null || password.isEmpty()) throw new Exception("password is empty");            ///!!!!!!!!!!!!
 
         try {
             Configuration configure = new Configuration().configure("config/hibernate.cfg.xml");
@@ -55,14 +55,32 @@ public class HibernateHelper {
             configure.setProperty("hibernate.connection.password", password);
             sessionFactory = configure.buildSessionFactory();
 
+            /**
+             * В этом месте уже есть все новые созданные таблицы
+             * тут надо запускать скрипты по миграции и добавлению необходимых данных
+             * На сейчас вижу, что должен быть минимум один пользователь (с флагом Адиин) в таблице пользователей
+             * под которым мы подключаемся в первый раз. Он создает других пользователей, группы, задания...
+             */
+
+
             UserDao dao = new UserDao();
             connectedUser = dao.getUserByUsername(username);
             if (connectedUser == null) throw new Exception("Пользователь не зарегистрирован в системе");
-            if (connectedUser.getAdmin()){
+//            if (connectedUser == null){
+//                User user = new User();
+//                user.setCode(username);
+//                user.setAdmin(true);
+//                ObjectDao<User> objectDao = new ObjectDao<>(User.class);
+//                objectDao.add(user);
+//                connectedUser = user;
+//            }
+
+            if (connectedUser.getAdmin()) {
                 fillAllUsers();
                 fillAllGroups();
             }
-        } catch (/*Hibernate*/ Exception e){
+
+        } catch (Exception e){
             logger.error("buildSessionFactory error: ", e);
             throw new Exception(e);
         }

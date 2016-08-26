@@ -15,5 +15,6 @@
 
     <mapping class="ru.schegrov.entity.Job"/>
     <mapping class="ru.schegrov.entity.User"/>
+    <mapping class="ru.schegrov.entity.Group"/>
   </session-factory>
 </hibernate-configuration>

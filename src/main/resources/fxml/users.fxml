@@ -72,6 +72,8 @@
        <contextMenu>
           <ContextMenu>
               <items>
+                  <MenuItem fx:id="refresh" text="%app.tabpane.tab.users.menu.refresh" onAction="#refreshContextMenu" />
+                  <SeparatorMenuItem/>
                   <MenuItem fx:id="add" text="%app.tabpane.tab.users.menu.add" onAction="#addContextMenu" />
                   <MenuItem fx:id="del" text="%app.tabpane.tab.users.menu.del" onAction="#delContextMenu"/>
               </items>

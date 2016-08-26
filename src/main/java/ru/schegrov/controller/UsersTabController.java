@@ -1,5 +1,7 @@
 package ru.schegrov.controller;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -9,12 +11,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
 import ru.schegrov.dao.ObjectDao;
+import ru.schegrov.entity.Group;
 import ru.schegrov.entity.User;
 import ru.schegrov.util.AlertHelper;
 import ru.schegrov.util.BooleanStringConverter;
 import ru.schegrov.util.HibernateHelper;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -25,6 +29,7 @@ public class UsersTabController implements Initializable {
     private AlertHelper alertError;
     private ResourceBundle resources;
     @FXML private TableView<User> usersTableView;
+    @FXML private TableView<Group> groupsTableView;
     @FXML private TableColumn<User,String> code;
     @FXML private TableColumn<User,String> descr;
     @FXML private TableColumn<User,Boolean> admin;
@@ -68,14 +73,21 @@ public class UsersTabController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
-
-        HibernateHelper.getAllUsers().addListener((ListChangeListener<User>) c -> {
-            usersTableView.getItems().clear();
-            usersTableView.getItems().addAll(c.getList());
-        });
-
         alertError = new AlertHelper(Alert.AlertType.ERROR);
         alertError.setTitle(resources.getString("app.alert.title"));
+
+        HibernateHelper.getAllUsers().addListener((ListChangeListener<User>) users -> {
+            usersTableView.getItems().clear();
+            usersTableView.getItems().addAll(users.getList());
+        });
+
+        usersTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldUser, newUser) -> {
+            if (newUser != null) {
+                groupsTableView.getItems().clear();
+                groupsTableView.getItems().addAll(newUser.getGroups());
+            }
+        });
+
         code.setOnEditCommit(event -> {
             event.getRowValue().setCode(event.getNewValue());
             edit(event.getRowValue());
@@ -101,5 +113,13 @@ public class UsersTabController implements Initializable {
             alertError.setException(e);
             alertError.show();
         }
+    }
+
+    public void refreshContextMenu(ActionEvent actionEvent) {
+        HibernateHelper.getAllUsers().clear();
+        ObjectDao<User> dao = new ObjectDao<>(User.class);
+        List<User> list = dao.getAll();
+        list.forEach(user -> HibernateHelper.getAllUsers().add(user));
+        usersTableView.getSelectionModel().selectFirst();
     }
 }

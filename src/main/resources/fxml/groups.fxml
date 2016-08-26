@@ -31,7 +31,7 @@
         </columnResizePolicy>
 
         <columns>
-            <TableColumn fx:id="code_id" text="%app.tabpane.tab.groups.code">
+            <TableColumn fx:id="code" text="%app.tabpane.tab.groups.code">
                 <cellValueFactory>
                     <PropertyValueFactory property="code"/>
                 </cellValueFactory>
@@ -39,7 +39,7 @@
                     <TextFieldTableCell fx:factory="forTableColumn"/>
                 </cellFactory>
             </TableColumn>
-            <TableColumn text="%app.tabpane.tab.groups.descr">
+            <TableColumn fx:id="descr" text="%app.tabpane.tab.groups.descr">
                 <cellValueFactory>
                     <PropertyValueFactory property="descr"/>
                 </cellValueFactory>
@@ -49,23 +49,15 @@
             </TableColumn>
         </columns>
 
-        <items>
-            <FXCollections fx:factory="observableArrayList">
-                <User code="Jacob" descr="Smith"/>
-                <User code="Isabella" descr="Johnson"/>
-                <User code="Ethan" descr="Williams"/>
-                <User code="Emma" descr="Jones"/>
-                <User code="Michael" descr="Brown"/>
-            </FXCollections>
-        </items>
-
         <sortOrder>
-            <fx:reference source="code_id"/>
+            <fx:reference source="code"/>
         </sortOrder>
 
        <contextMenu>
           <ContextMenu>
               <items>
+                  <MenuItem fx:id="refresh" text="%app.tabpane.tab.groups.menu.refresh" onAction="#refreshContextMenu" />
+                  <SeparatorMenuItem/>
                   <MenuItem fx:id="add" text="%app.tabpane.tab.groups.menu.add" onAction="#addContextMenu" />
                   <MenuItem fx:id="del" text="%app.tabpane.tab.groups.menu.del" onAction="#delContextMenu"/>
               </items>

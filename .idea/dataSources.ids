@@ -10,8 +10,8 @@
       <schema id="1" name="RAMONHB">
         <object-id>529</object-id>
         <created-timestamp>2016-05-06.15:34:54</created-timestamp>
-        <modified-timestamp>2016-08-24.23:19:23</modified-timestamp>
-        <introspection-timestamp>2016-08-24.23:19:42</introspection-timestamp>
+        <modified-timestamp>2016-08-25.16:53:48</modified-timestamp>
+        <introspection-timestamp>2016-08-26.15:04:10</introspection-timestamp>
       </schema>
       <sequence id="2" parent="1" name="ROLES">
         <object-id>937569</object-id>
@@ -64,21 +64,21 @@
         <organization>HEAP</organization>
       </table>
       <table id="10" parent="1" name="T_FXR_JOBS">
-        <object-id>958942</object-id>
-        <created-timestamp>2016-08-24.23:19:23</created-timestamp>
-        <modified-timestamp>2016-08-24.23:19:23</modified-timestamp>
+        <object-id>959000</object-id>
+        <created-timestamp>2016-08-25.16:53:48</created-timestamp>
+        <modified-timestamp>2016-08-25.16:53:48</modified-timestamp>
         <organization>HEAP</organization>
       </table>
       <table id="11" parent="1" name="T_FXR_SEQ">
-        <object-id>958944</object-id>
-        <created-timestamp>2016-08-24.23:19:23</created-timestamp>
-        <modified-timestamp>2016-08-24.23:19:23</modified-timestamp>
+        <object-id>959002</object-id>
+        <created-timestamp>2016-08-25.16:53:48</created-timestamp>
+        <modified-timestamp>2016-08-25.16:53:48</modified-timestamp>
         <organization>HEAP</organization>
       </table>
       <table id="12" parent="1" name="T_FXR_USERS">
-        <object-id>958946</object-id>
-        <created-timestamp>2016-08-24.23:19:23</created-timestamp>
-        <modified-timestamp>2016-08-24.23:19:23</modified-timestamp>
+        <object-id>959004</object-id>
+        <created-timestamp>2016-08-25.16:53:48</created-timestamp>
+        <modified-timestamp>2016-08-25.16:53:48</modified-timestamp>
         <organization>HEAP</organization>
       </table>
       <column id="13" parent="3" name="ID">
@@ -332,22 +332,22 @@ DRIVER_ID</columns>
         <mandatory>1</mandatory>
         <data-type>NUMBER(10)</data-type>
       </column>
-      <index id="59" parent="10" name="SYS_C00693204">
+      <index id="59" parent="10" name="SYS_C00693287">
         <name-surrogate>1</name-surrogate>
-        <object-id>958943</object-id>
-        <created-timestamp>2016-08-24.23:19:23</created-timestamp>
-        <modified-timestamp>2016-08-24.23:19:23</modified-timestamp>
+        <object-id>959001</object-id>
+        <created-timestamp>2016-08-25.16:53:48</created-timestamp>
+        <modified-timestamp>2016-08-25.16:53:48</modified-timestamp>
         <columns>ID</columns>
         <desc-columns></desc-columns>
         <unique>1</unique>
         <tablespace-name>USERS</tablespace-name>
       </index>
-      <key id="60" parent="10" name="SYS_C00693204">
+      <key id="60" parent="10" name="SYS_C00693287">
         <name-surrogate>1</name-surrogate>
-        <modified-timestamp>2016-08-24.23:19:23</modified-timestamp>
+        <modified-timestamp>2016-08-25.16:53:48</modified-timestamp>
         <columns>ID</columns>
         <initially-deferred>1</initially-deferred>
-        <underlying-index>SYS_C00693204</underlying-index>
+        <underlying-index>SYS_C00693287</underlying-index>
         <primary>1</primary>
       </key>
       <column id="61" parent="11" name="NAME">
@@ -357,52 +357,70 @@ DRIVER_ID</columns>
       <column id="62" parent="11" name="NUM">
         <data-type>NUMBER(19)</data-type>
       </column>
-      <index id="63" parent="11" name="SYS_C00693206">
+      <index id="63" parent="11" name="SYS_C00693289">
         <name-surrogate>1</name-surrogate>
-        <object-id>958945</object-id>
-        <created-timestamp>2016-08-24.23:19:23</created-timestamp>
-        <modified-timestamp>2016-08-24.23:19:23</modified-timestamp>
+        <object-id>959003</object-id>
+        <created-timestamp>2016-08-25.16:53:48</created-timestamp>
+        <modified-timestamp>2016-08-25.16:53:48</modified-timestamp>
         <columns>NAME</columns>
         <desc-columns></desc-columns>
         <unique>1</unique>
         <tablespace-name>USERS</tablespace-name>
       </index>
-      <key id="64" parent="11" name="SYS_C00693206">
+      <key id="64" parent="11" name="SYS_C00693289">
         <name-surrogate>1</name-surrogate>
-        <modified-timestamp>2016-08-24.23:19:23</modified-timestamp>
+        <modified-timestamp>2016-08-25.16:53:48</modified-timestamp>
         <columns>NAME</columns>
         <initially-deferred>1</initially-deferred>
-        <underlying-index>SYS_C00693206</underlying-index>
+        <underlying-index>SYS_C00693289</underlying-index>
         <primary>1</primary>
       </key>
-      <column id="65" parent="12" name="CODE">
+      <column id="65" parent="12" name="ID">
         <mandatory>1</mandatory>
-        <data-type>VARCHAR2(255)</data-type>
+        <data-type>NUMBER(10)</data-type>
       </column>
       <column id="66" parent="12" name="ADMIN">
         <mandatory>1</mandatory>
         <data-type>NUMBER(1)</data-type>
       </column>
-      <column id="67" parent="12" name="DESCR">
+      <column id="67" parent="12" name="CODE">
         <data-type>VARCHAR2(255)</data-type>
       </column>
-      <index id="68" parent="12" name="SYS_C00693209">
+      <column id="68" parent="12" name="DESCR">
+        <data-type>VARCHAR2(255)</data-type>
+      </column>
+      <index id="69" parent="12" name="SYS_C00693292">
         <name-surrogate>1</name-surrogate>
-        <object-id>958947</object-id>
-        <created-timestamp>2016-08-24.23:19:23</created-timestamp>
-        <modified-timestamp>2016-08-24.23:19:23</modified-timestamp>
+        <object-id>959005</object-id>
+        <created-timestamp>2016-08-25.16:53:48</created-timestamp>
+        <modified-timestamp>2016-08-25.16:53:48</modified-timestamp>
+        <columns>ID</columns>
+        <desc-columns></desc-columns>
+        <unique>1</unique>
+        <tablespace-name>USERS</tablespace-name>
+      </index>
+      <index id="70" parent="12" name="T_FXR_USERS_UK1">
+        <object-id>959006</object-id>
+        <created-timestamp>2016-08-25.16:53:48</created-timestamp>
+        <modified-timestamp>2016-08-25.16:53:48</modified-timestamp>
         <columns>CODE</columns>
         <desc-columns></desc-columns>
         <unique>1</unique>
         <tablespace-name>USERS</tablespace-name>
       </index>
-      <key id="69" parent="12" name="SYS_C00693209">
+      <key id="71" parent="12" name="SYS_C00693292">
         <name-surrogate>1</name-surrogate>
-        <modified-timestamp>2016-08-24.23:19:23</modified-timestamp>
+        <modified-timestamp>2016-08-25.16:53:48</modified-timestamp>
+        <columns>ID</columns>
+        <initially-deferred>1</initially-deferred>
+        <underlying-index>SYS_C00693292</underlying-index>
+        <primary>1</primary>
+      </key>
+      <key id="72" parent="12" name="T_FXR_USERS_UK1">
+        <modified-timestamp>2016-08-25.16:53:48</modified-timestamp>
         <columns>CODE</columns>
         <initially-deferred>1</initially-deferred>
-        <underlying-index>SYS_C00693209</underlying-index>
-        <primary>1</primary>
+        <underlying-index>T_FXR_USERS_UK1</underlying-index>
       </key>
     </database-model>
   </data-source>
