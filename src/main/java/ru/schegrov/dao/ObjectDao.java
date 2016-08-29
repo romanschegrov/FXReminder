@@ -1,6 +1,7 @@
 package ru.schegrov.dao;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import ru.schegrov.util.HibernateHelper;
@@ -73,6 +74,7 @@ public class ObjectDao<T> implements CrudDao<T>  {
             session = HibernateHelper.getSessionFactory().openSession();
             session.beginTransaction();
             list = session.createCriteria(type)
+                    .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                     .list();
             session.getTransaction().commit();
             logger.info("commit");

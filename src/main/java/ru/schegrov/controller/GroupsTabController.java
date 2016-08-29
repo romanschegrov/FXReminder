@@ -1,20 +1,15 @@
 package ru.schegrov.controller;
 
-import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.ChoiceBoxTableCell;
 import ru.schegrov.dao.ObjectDao;
 import ru.schegrov.entity.Group;
 import ru.schegrov.entity.User;
 import ru.schegrov.util.AlertHelper;
-import ru.schegrov.util.BooleanStringConverter;
-import ru.schegrov.util.HibernateHelper;
-
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -37,10 +32,7 @@ public class GroupsTabController implements Initializable {
         alertError = new AlertHelper(Alert.AlertType.ERROR);
         alertError.setTitle(resources.getString("app.alert.title"));
 
-        HibernateHelper.getAllGroups().addListener((ListChangeListener<Group>) c -> {
-            groupsTableView.getItems().clear();
-            groupsTableView.getItems().addAll(c.getList());
-        });
+        refreshGroupsTable();
 
         groupsTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldGroup, newGroup) -> {
             if (newGroup != null) {
@@ -77,7 +69,7 @@ public class GroupsTabController implements Initializable {
             group.setCode(resources.getString("app.tabpane.tab.groups.new"));
             ObjectDao<Group> dao = new ObjectDao<>(Group.class);
             dao.add(group);
-            HibernateHelper.getAllGroups().add(group);
+            groupsTableView.getItems().add(group);
             groupsTableView.getSelectionModel().selectLast();
         } catch (Exception e) {
             alertError.setContentText(resources.getString("app.alert.groups.add"));
@@ -93,7 +85,7 @@ public class GroupsTabController implements Initializable {
             try {
                 ObjectDao<Group> dao = new ObjectDao<>(Group.class);
                 dao.delete(group);
-                HibernateHelper.getAllGroups().remove(group);
+                groupsTableView.getItems().remove(group);
                 if (index == 0) {
                     groupsTableView.getSelectionModel().selectFirst();
                 } else {
@@ -108,10 +100,14 @@ public class GroupsTabController implements Initializable {
     }
 
     public void refreshContextMenu(ActionEvent actionEvent) {
-        HibernateHelper.getAllGroups().clear();
+        refreshGroupsTable();
+    }
+
+    private void refreshGroupsTable(){
+        groupsTableView.getItems().clear();
         ObjectDao<Group> dao = new ObjectDao<>(Group.class);
         List<Group> list = dao.getAll();
-        list.forEach(group -> HibernateHelper.getAllGroups().add(group));
+        list.forEach(group -> groupsTableView.getItems().add(group));
         groupsTableView.getSelectionModel().selectFirst();
     }
 }

@@ -60,14 +60,10 @@ public class AppController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
-
         alertError.setTitle(resources.getString("app.alert.title"));
 
         model = new AppModel(tree, table);
         model.setResources(resources);
-
-        initController("/fxml/users.fxml", t -> new UsersTabController(), tabUsers);
-        initController("/fxml/groups.fxml", t -> new GroupsTabController(), tabGroups);
 
         accordion.setExpandedPane(sign);
 
@@ -107,7 +103,7 @@ public class AppController implements Initializable {
         signout.setDisable(!bool);
         if (bool){
             try {
-                HibernateHelper.getSessionFactory(username.getText(), password.getText());
+                HibernateHelper.getSessionFactory(username.getText(), password.getText(), resources);
                 error.setText(null);
                 accordion.setExpandedPane(jobs);
                 model.fillTreeView();
@@ -115,6 +111,8 @@ public class AppController implements Initializable {
                     tabProperties.setDisable(false);
                     tabUsers.setDisable(false);
                     tabGroups.setDisable(false);
+                    initController("/fxml/users.fxml", t -> new UsersTabController(), tabUsers);
+                    initController("/fxml/groups.fxml", t -> new GroupsTabController(), tabGroups);
                 }
                 logger.info("Connected");
             } catch (Exception e) {

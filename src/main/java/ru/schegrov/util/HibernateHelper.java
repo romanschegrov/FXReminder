@@ -13,6 +13,7 @@ import ru.schegrov.entity.Group;
 import ru.schegrov.entity.User;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 public class HibernateHelper {
 
@@ -23,8 +24,6 @@ public class HibernateHelper {
     private static final Configuration startConfigure;
     private static SessionFactory sessionFactory;
     private static User connectedUser;
-    private static ObservableList<User> allUsers = FXCollections.observableArrayList();
-    private static ObservableList<Group> allGroups = FXCollections.observableArrayList();
 
     static {
         try {
@@ -42,12 +41,12 @@ public class HibernateHelper {
 
     private HibernateHelper() {}
 
-    public static SessionFactory getSessionFactory (String username, String password) throws Exception {
+    public static SessionFactory getSessionFactory (String username, String password, ResourceBundle resources) throws Exception {
 
         logger.info("start getSessionFactory");
 
-        if (username == null || username.isEmpty()) throw new Exception("username is empty");            ///!!!!!!!!!!!!
-        if (password == null || password.isEmpty()) throw new Exception("password is empty");            ///!!!!!!!!!!!!
+        if (username == null || username.isEmpty()) throw new Exception(resources.getString("app.error.username"));
+        if (password == null || password.isEmpty()) throw new Exception(resources.getString("app.error.password"));
 
         try {
             Configuration configure = new Configuration().configure("config/hibernate.cfg.xml");
@@ -65,7 +64,7 @@ public class HibernateHelper {
 
             UserDao dao = new UserDao();
             connectedUser = dao.getUserByUsername(username);
-            if (connectedUser == null) throw new Exception("Пользователь не зарегистрирован в системе");
+            if (connectedUser == null) throw new Exception(resources.getString("app.error.notregistr"));
 //            if (connectedUser == null){
 //                User user = new User();
 //                user.setCode(username);
@@ -75,28 +74,11 @@ public class HibernateHelper {
 //                connectedUser = user;
 //            }
 
-            if (connectedUser.getAdmin()) {
-                fillAllUsers();
-                fillAllGroups();
-            }
-
         } catch (Exception e){
             logger.error("buildSessionFactory error: ", e);
             throw new Exception(e);
         }
         return sessionFactory;
-    }
-
-    private static void fillAllUsers() throws Exception {
-        ObjectDao<User> dao = new ObjectDao<>(User.class);
-        List<User> list = dao.getAll();
-        list.forEach(user -> allUsers.add(user));
-    }
-
-    private static void fillAllGroups() throws Exception {
-        ObjectDao<Group> dao = new ObjectDao<>(Group.class);
-        List<Group> list = dao.getAll();
-        list.forEach(group -> allGroups.add(group));
     }
 
     public static SessionFactory getSessionFactory () throws Exception{
@@ -134,13 +116,5 @@ public class HibernateHelper {
 
     public static User getConnectedUser() {
         return connectedUser;
-    }
-
-    public static ObservableList<User> getAllUsers() {
-        return allUsers;
-    }
-
-    public static ObservableList<Group> getAllGroups() {
-        return allGroups;
     }
 }

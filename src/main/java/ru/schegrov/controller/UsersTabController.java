@@ -1,8 +1,5 @@
 package ru.schegrov.controller;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,8 +12,6 @@ import ru.schegrov.entity.Group;
 import ru.schegrov.entity.User;
 import ru.schegrov.util.AlertHelper;
 import ru.schegrov.util.BooleanStringConverter;
-import ru.schegrov.util.HibernateHelper;
-
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -34,52 +29,13 @@ public class UsersTabController implements Initializable {
     @FXML private TableColumn<User,String> descr;
     @FXML private TableColumn<User,Boolean> admin;
 
-    public void addContextMenu(ActionEvent actionEvent) {
-        try {
-            User user = new User();
-            user.setCode(resources.getString("app.tabpane.tab.users.new"));
-            ObjectDao<User> dao = new ObjectDao<>(User.class);
-            dao.add(user);
-            HibernateHelper.getAllUsers().add(user);
-            usersTableView.getSelectionModel().selectLast();
-        } catch (Exception e) {
-            alertError.setContentText(resources.getString("app.alert.users.add"));
-            alertError.setException(e);
-            alertError.show();
-        }
-    }
-
-    public void delContextMenu(ActionEvent actionEvent) {
-        User user = usersTableView.getSelectionModel().getSelectedItem();
-        int index = usersTableView.getSelectionModel().getSelectedIndex();
-        if (user != null) {
-            try {
-                ObjectDao<User> dao = new ObjectDao<>(User.class);
-                dao.delete(user);
-                HibernateHelper.getAllUsers().remove(user);
-                if (index == 0) {
-                    usersTableView.getSelectionModel().selectFirst();
-                } else {
-                    usersTableView.getSelectionModel().select(index-1);
-                }
-            } catch (Exception e) {
-                alertError.setContentText(resources.getString("app.alert.users.del"));
-                alertError.setException(e);
-                alertError.show();
-            }
-        }
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
         alertError = new AlertHelper(Alert.AlertType.ERROR);
         alertError.setTitle(resources.getString("app.alert.title"));
 
-        HibernateHelper.getAllUsers().addListener((ListChangeListener<User>) users -> {
-            usersTableView.getItems().clear();
-            usersTableView.getItems().addAll(users.getList());
-        });
+        refreshUsersTable();
 
         usersTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldUser, newUser) -> {
             if (newUser != null) {
@@ -92,10 +48,12 @@ public class UsersTabController implements Initializable {
             event.getRowValue().setCode(event.getNewValue());
             edit(event.getRowValue());
         });
+
         descr.setOnEditCommit(event -> {
             event.getRowValue().setDescr(event.getNewValue());
             edit(event.getRowValue());
         });
+
         BooleanStringConverter converter  = new BooleanStringConverter(resources);
         admin.setCellFactory(ChoiceBoxTableCell.forTableColumn(converter, true, false));
         admin.setOnEditCommit(event -> {
@@ -115,11 +73,51 @@ public class UsersTabController implements Initializable {
         }
     }
 
+    public void addContextMenu(ActionEvent actionEvent) {
+        try {
+            User user = new User();
+            user.setCode(resources.getString("app.tabpane.tab.users.new"));
+            ObjectDao<User> dao = new ObjectDao<>(User.class);
+            dao.add(user);
+            usersTableView.getItems().add(user);
+            usersTableView.getSelectionModel().selectLast();
+        } catch (Exception e) {
+            alertError.setContentText(resources.getString("app.alert.users.add"));
+            alertError.setException(e);
+            alertError.show();
+        }
+    }
+
+    public void delContextMenu(ActionEvent actionEvent) {
+        User user = usersTableView.getSelectionModel().getSelectedItem();
+        int index = usersTableView.getSelectionModel().getSelectedIndex();
+        if (user != null) {
+            try {
+                ObjectDao<User> dao = new ObjectDao<>(User.class);
+                dao.delete(user);
+                usersTableView.getItems().remove(user);
+                if (index == 0) {
+                    usersTableView.getSelectionModel().selectFirst();
+                } else {
+                    usersTableView.getSelectionModel().select(index-1);
+                }
+            } catch (Exception e) {
+                alertError.setContentText(resources.getString("app.alert.users.del"));
+                alertError.setException(e);
+                alertError.show();
+            }
+        }
+    }
+
     public void refreshContextMenu(ActionEvent actionEvent) {
-        HibernateHelper.getAllUsers().clear();
+        refreshUsersTable();
+    }
+
+    private void refreshUsersTable(){
+        usersTableView.getItems().clear();
         ObjectDao<User> dao = new ObjectDao<>(User.class);
         List<User> list = dao.getAll();
-        list.forEach(user -> HibernateHelper.getAllUsers().add(user));
+        list.forEach(user -> usersTableView.getItems().add(user));
         usersTableView.getSelectionModel().selectFirst();
     }
 }
