@@ -66,7 +66,7 @@ public class Group {
         this.descr.set(descr);
     }
 
-    @ManyToMany(mappedBy = "groups", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "groups", fetch = FetchType.EAGER/*, cascade = CascadeType.ALL*/)
     public List<User> getUsers() {
         return users;
     }

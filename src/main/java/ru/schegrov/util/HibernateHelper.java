@@ -64,15 +64,15 @@ public class HibernateHelper {
 
             UserDao dao = new UserDao();
             connectedUser = dao.getUserByUsername(username);
-            if (connectedUser == null) throw new Exception(resources.getString("app.error.notregistr"));
-//            if (connectedUser == null){
-//                User user = new User();
-//                user.setCode(username);
-//                user.setAdmin(true);
-//                ObjectDao<User> objectDao = new ObjectDao<>(User.class);
-//                objectDao.add(user);
-//                connectedUser = user;
-//            }
+//            if (connectedUser == null) throw new Exception(resources.getString("app.error.notregistr"));
+            if (connectedUser == null){
+                User user = new User();
+                user.setCode(username);
+                user.setAdmin(true);
+                ObjectDao<User> objectDao = new ObjectDao<>(User.class);
+                objectDao.add(user);
+                connectedUser = user;
+            }
 
         } catch (Exception e){
             logger.error("buildSessionFactory error: ", e);

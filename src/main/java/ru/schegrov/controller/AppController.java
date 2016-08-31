@@ -111,8 +111,8 @@ public class AppController implements Initializable {
                     tabProperties.setDisable(false);
                     tabUsers.setDisable(false);
                     tabGroups.setDisable(false);
-                    initController("/fxml/users.fxml", t -> new UsersTabController(), tabUsers);
-                    initController("/fxml/groups.fxml", t -> new GroupsTabController(), tabGroups);
+                    initController("/fxml/users.fxml", t -> new UsersTabController(this), tabUsers);
+                    initController("/fxml/groups.fxml", t -> new GroupsTabController(this), tabGroups);
                 }
                 logger.info("Connected");
             } catch (Exception e) {
@@ -156,7 +156,7 @@ public class AppController implements Initializable {
                 selectedItem.getChildren().add(new TreeItem(newJob, model.loadImage("/pic/folder.png")));
                 selectedItem.setExpanded(true);
             } catch (Exception e) {
-                logger.error("addContextMenu error: ", e);
+                logger.error("addUserContextMenu error: ", e);
 
                 alertError.setContentText(resources.getString("app.alert.jobs.add"));
                 alertError.setException(e);
@@ -169,5 +169,9 @@ public class AppController implements Initializable {
         alertError.setContentText(resources.getString("app.alert.jobs.del"));
 //        alertError.setException(e);
         alertError.show();
+    }
+
+    public AppModel getModel() {
+        return model;
     }
 }

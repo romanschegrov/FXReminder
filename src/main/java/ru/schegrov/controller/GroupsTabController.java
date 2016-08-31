@@ -1,14 +1,21 @@
 package ru.schegrov.controller;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.ChoiceBoxTableCell;
+import ru.schegrov.dao.GroupDao;
 import ru.schegrov.dao.ObjectDao;
+import ru.schegrov.dao.UserDao;
 import ru.schegrov.entity.Group;
 import ru.schegrov.entity.User;
+import ru.schegrov.model.GroupsTabModel;
 import ru.schegrov.util.AlertHelper;
 import java.net.URL;
 import java.util.List;
@@ -19,12 +26,26 @@ import java.util.ResourceBundle;
  */
 public class GroupsTabController implements Initializable {
 
+    private GroupsTabModel model;
+    private AppController parent;
     private AlertHelper alertError;
     private ResourceBundle resources;
+    @FXML private MenuItem urefresh;
+    @FXML private MenuItem grefresh;
+    @FXML private MenuItem uadd;
+    @FXML private MenuItem gadd;
+    @FXML private MenuItem udel;
+    @FXML private MenuItem gdel;
     @FXML private TableView<Group> groupsTableView;
-    @FXML private TableView<User> usersTableView;
     @FXML private TableColumn<Group,String> code;
     @FXML private TableColumn<Group,String> descr;
+    @FXML private TableView<User> usersTableView;
+    @FXML private TableColumn<User,String> ucode;
+
+    public GroupsTabController(AppController parent) {
+        this.parent = parent;
+        this.model = new GroupsTabModel();
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -32,12 +53,24 @@ public class GroupsTabController implements Initializable {
         alertError = new AlertHelper(Alert.AlertType.ERROR);
         alertError.setTitle(resources.getString("app.alert.title"));
 
+        urefresh.setGraphic(parent.getModel().loadImage("/pic/refresh.png"));
+        grefresh.setGraphic(parent.getModel().loadImage("/pic/refresh.png"));
+        uadd.setGraphic(parent.getModel().loadImage("/pic/add.png"));
+        gadd.setGraphic(parent.getModel().loadImage("/pic/add.png"));
+        udel.setGraphic(parent.getModel().loadImage("/pic/del.png"));
+        gdel.setGraphic(parent.getModel().loadImage("/pic/del.png"));
+
         refreshGroupsTable();
+        refreshUsersTable();
 
         groupsTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldGroup, newGroup) -> {
             if (newGroup != null) {
                 usersTableView.getItems().clear();
                 usersTableView.getItems().addAll(newGroup.getUsers());
+                ObservableList<String> allowedUsers = model.allowedUsers(newGroup);
+                if (!allowedUsers.isEmpty()) {
+                    ucode.setCellFactory(ChoiceBoxTableCell.forTableColumn(allowedUsers));
+                }
             }
         });
 
@@ -49,6 +82,36 @@ public class GroupsTabController implements Initializable {
         descr.setOnEditCommit(event -> {
             event.getRowValue().setDescr(event.getNewValue());
             edit(event.getRowValue());
+        });
+
+        ucode.setOnEditCommit(event -> {
+            Group selectedGroup = groupsTableView.getSelectionModel().getSelectedItem();
+            if (selectedGroup != null) {
+                try {
+                    User oldUser = usersTableView.getSelectionModel().getSelectedItem();
+
+                    UserDao userDao = new UserDao();
+                    String newUsername = event.getNewValue();
+                    User newUser = userDao.getUserByUsername(newUsername);
+
+                    ObjectDao<User> userObjectDao = new ObjectDao<>(User.class);
+                    oldUser.getGroups().remove(selectedGroup);
+                    userObjectDao.update(oldUser);
+                    newUser.getGroups().add(selectedGroup);
+                    userObjectDao.update(newUser);
+
+                    selectedGroup.getUsers().remove(oldUser);
+                    selectedGroup.getUsers().add(newUser);
+
+                    int index = usersTableView.getSelectionModel().getSelectedIndex();
+                    refreshUsersTable();
+                    usersTableView.getSelectionModel().select(index);
+                } catch (Exception e) {
+                    alertError.setContentText(resources.getString("app.alert.users.update"));
+                    alertError.setException(e);
+                    alertError.show();
+                }
+            }
         });
     }
 
@@ -63,7 +126,7 @@ public class GroupsTabController implements Initializable {
         }
     }
 
-    public void addContextMenu(ActionEvent actionEvent) {
+    public void addGroupContextMenu(ActionEvent actionEvent) {
         try {
             Group group = new Group();
             group.setCode(resources.getString("app.tabpane.tab.groups.new"));
@@ -78,7 +141,7 @@ public class GroupsTabController implements Initializable {
         }
     }
 
-    public void delContextMenu(ActionEvent actionEvent) {
+    public void delGroupContextMenu(ActionEvent actionEvent) {
         Group group = groupsTableView.getSelectionModel().getSelectedItem();
         int index = groupsTableView.getSelectionModel().getSelectedIndex();
         if (group != null) {
@@ -99,7 +162,7 @@ public class GroupsTabController implements Initializable {
         }
     }
 
-    public void refreshContextMenu(ActionEvent actionEvent) {
+    public void refreshGroupContextMenu(ActionEvent actionEvent) {
         refreshGroupsTable();
     }
 
@@ -109,5 +172,95 @@ public class GroupsTabController implements Initializable {
         List<Group> list = dao.getAll();
         list.forEach(group -> groupsTableView.getItems().add(group));
         groupsTableView.getSelectionModel().selectFirst();
+    }
+
+    public void addUserContextMenu(ActionEvent actionEvent) {
+        Group selectedGroup = groupsTableView.getSelectionModel().getSelectedItem();
+        if (selectedGroup != null) {
+            ObservableList<String> allowedUsers = model.allowedUsers(selectedGroup);
+            if (!allowedUsers.isEmpty()) {
+                try {
+
+                    UserDao userDao = new UserDao();
+                    String username = allowedUsers.iterator().next();
+                    User user = userDao.getUserByUsername(username);
+
+                    ObjectDao<User> userObjectDao = new ObjectDao<>(User.class);
+                    user.getGroups().add(selectedGroup);
+                    userObjectDao.update(user);
+
+                    selectedGroup.getUsers().add(user);
+                    ObservableList<String> allowedUsersPost = model.allowedUsers(selectedGroup);
+                    if (!allowedUsersPost.isEmpty()) {
+                        usersTableView.setEditable(true);
+                        ucode.setCellFactory(ChoiceBoxTableCell.forTableColumn(allowedUsersPost));
+                    } else {
+                        usersTableView.setEditable(false);
+                    }
+
+                    usersTableView.getItems().add(user);
+                    usersTableView.getSelectionModel().selectLast();
+
+                } catch (Exception e) {
+                    alertError.setContentText(resources.getString("app.alert.users.add"));
+                    alertError.setException(e);
+                    alertError.show();
+                }
+            }
+        }
+    }
+
+    public void delUserContextMenu(ActionEvent actionEvent) {
+        Group selectedGroup = groupsTableView.getSelectionModel().getSelectedItem();
+        if (selectedGroup != null) {
+            User selectedUser = usersTableView.getSelectionModel().getSelectedItem();
+            if (selectedUser != null) {
+                try {
+
+                    ObjectDao<User> userObjectDao = new ObjectDao<>(User.class);
+                    selectedUser.getGroups().remove(selectedGroup);
+                    userObjectDao.update(selectedUser);
+
+                    selectedGroup.getUsers().remove(selectedUser);
+                    ObservableList<String> allowedUsersPost = model.allowedUsers(selectedGroup);
+                    if (!allowedUsersPost.isEmpty()) {
+                        usersTableView.setEditable(true);
+                        ucode.setCellFactory(ChoiceBoxTableCell.forTableColumn(allowedUsersPost));
+                    } else {
+                        usersTableView.setEditable(false);
+                    }
+
+                    usersTableView.getItems().remove(selectedUser);
+                    int index = groupsTableView.getSelectionModel().getSelectedIndex();
+                    if (index == 0) {
+                        usersTableView.getSelectionModel().selectFirst();
+                    } else {
+                        usersTableView.getSelectionModel().select(index - 1);
+                    }
+                } catch (Exception e) {
+                    alertError.setContentText(resources.getString("app.alert.users.del"));
+                    alertError.setException(e);
+                    alertError.show();
+                }
+            }
+        }
+    }
+
+    public void refreshUserContextMenu(ActionEvent actionEvent) { refreshUsersTable(); }
+
+    private void refreshUsersTable(){
+        Group selectedGroup = groupsTableView.getSelectionModel().getSelectedItem();
+        if (selectedGroup != null) {
+            ObservableList<String> allowedUsers = model.allowedUsers(selectedGroup);
+            if (!allowedUsers.isEmpty()) {
+                usersTableView.setEditable(true);
+                ucode.setCellFactory(ChoiceBoxTableCell.forTableColumn(allowedUsers));
+            } else {
+                usersTableView.setEditable(false);
+            }
+            usersTableView.getItems().clear();
+            usersTableView.getItems().addAll(selectedGroup.getUsers());
+            usersTableView.getSelectionModel().selectFirst();
+        }
     }
 }

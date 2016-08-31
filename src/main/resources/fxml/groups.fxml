@@ -6,8 +6,6 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.control.cell.*?>
 <?import javafx.geometry.Insets?>
-<?import ru.schegrov.entity.User?>
-<?import javafx.collections.FXCollections?>
 
 <VBox alignment="BOTTOM_CENTER"
       stylesheets="/css/app.css"
@@ -56,10 +54,10 @@
        <contextMenu>
           <ContextMenu>
               <items>
-                  <MenuItem fx:id="refresh" text="%app.tabpane.tab.groups.menu.refresh" onAction="#refreshContextMenu" />
+                  <MenuItem fx:id="grefresh" text="%app.tabpane.tab.groups.menu.refresh" onAction="#refreshGroupContextMenu" />
                   <SeparatorMenuItem/>
-                  <MenuItem fx:id="add" text="%app.tabpane.tab.groups.menu.add" onAction="#addContextMenu" />
-                  <MenuItem fx:id="del" text="%app.tabpane.tab.groups.menu.del" onAction="#delContextMenu"/>
+                  <MenuItem fx:id="gadd" text="%app.tabpane.tab.groups.menu.add" onAction="#addGroupContextMenu" />
+                  <MenuItem fx:id="gdel" text="%app.tabpane.tab.groups.menu.del" onAction="#delGroupContextMenu"/>
               </items>
           </ContextMenu>
        </contextMenu>
@@ -71,19 +69,35 @@
         </font>
     </Text>
 
-    <TableView fx:id="usersTableView" editable="false">
+    <TableView fx:id="usersTableView" editable="true">
         <columns>
-            <TableColumn text="%app.tabpane.tab.groups.code">
+            <TableColumn fx:id="ucode" text="%app.tabpane.tab.groups.code">
                 <cellValueFactory>
                     <PropertyValueFactory property="code"/>
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn text="%app.tabpane.tab.groups.descr">
+            <TableColumn fx:id="udescr" text="%app.tabpane.tab.groups.descr">
                 <cellValueFactory>
                     <PropertyValueFactory property="descr"/>
                 </cellValueFactory>
             </TableColumn>
         </columns>
+
+        <sortOrder>
+            <fx:reference source="ucode"/>
+        </sortOrder>
+
+        <contextMenu>
+            <ContextMenu>
+                <items>
+                    <MenuItem fx:id="urefresh" text="%app.tabpane.tab.groups.menu.refresh" onAction="#refreshUserContextMenu" />
+                    <SeparatorMenuItem/>
+                    <MenuItem fx:id="uadd" text="%app.tabpane.tab.groups.menu.add" onAction="#addUserContextMenu" />
+                    <MenuItem fx:id="udel" text="%app.tabpane.tab.groups.menu.del" onAction="#delUserContextMenu"/>
+                </items>
+            </ContextMenu>
+        </contextMenu>
+
     </TableView>
 
     <VBox alignment="BOTTOM_RIGHT">

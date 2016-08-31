@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import ru.schegrov.entity.User;
 import ru.schegrov.util.HibernateHelper;
 
 import java.util.List;
@@ -64,6 +65,32 @@ public class ObjectDao<T> implements CrudDao<T>  {
                 logger.info("session closed");
             }
         }
+    }
+
+    @Override
+    public T getById(int id) throws Exception {
+        Session session = null;
+        T obj = null;
+        try {
+            session = HibernateHelper.getSessionFactory().openSession();
+            session.beginTransaction();
+            Criteria criteria = session.createCriteria(type);
+            criteria.add(Restrictions.eq("id",id));
+            obj = (T) criteria.uniqueResult();
+            session.getTransaction().commit();
+            logger.info("commit");
+        } catch (Exception e){
+            session.getTransaction().rollback();
+            logger.error("rollback", e);
+            while (e.getCause() != null) e = (Exception) e.getCause();
+            throw new Exception(e.getMessage());
+        } finally {
+            if (session != null && session.isOpen()){
+                session.close();
+                logger.info("session closed");
+            }
+        }
+        return obj;
     }
 
     @Override
