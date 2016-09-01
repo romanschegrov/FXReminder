@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER"
+      stylesheets="/css/app.css"
+      xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ru.schegrov.controller.ConditionsTabController">
+   <children>
+
+       <Text text="%app.tabpane.tab.conditions.title">
+         <font>
+            <Font name="Tahoma" size="20.0" />
+         </font>
+      </Text>
+
+       <GridPane alignment="CENTER" hgap="5.0" vgap="10.0">
+         <children>
+             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1"><Label text="%app.tabpane.tab.conditions.identifier"/></VBox>
+            <TextField fx:id="identifier" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="2"><Label text="%app.tabpane.tab.conditions.parent"/></VBox>
+             <TextField fx:id="parentIdentifier" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="3"><Label text="%app.tabpane.tab.conditions.name"/></VBox>
+             <TextField fx:id="name" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="4"><Label text="%app.tabpane.tab.conditions.job"/></VBox>
+             <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                 <ToggleButton fx:id="yes" text="%app.tabpane.tab.conditions.yes" prefWidth="40" onAction="#toggleButtonAction">
+                     <toggleGroup>
+                         <ToggleGroup fx:id="group"/>
+                     </toggleGroup>
+                 </ToggleButton>
+                 <ToggleButton fx:id="no" text="%app.tabpane.tab.conditions.no" prefWidth="40" onAction="#toggleButtonAction" toggleGroup="$group"/>
+             </HBox>
+
+             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="5"><Label text="%app.tabpane.tab.conditions.min"/></VBox>
+             <ChoiceBox fx:id="min" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="6"><Label text="%app.tabpane.tab.conditions.sql"/></VBox>
+             <TextArea fx:id="sql" prefWidth="300" prefRowCount="3" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+
+             <Button fx:id="apply" text="%app.tabpane.tab.conditions.apply" onAction="#applyAction" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+       </GridPane>
+
+   </children>
+</VBox>

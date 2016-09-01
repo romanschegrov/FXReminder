@@ -44,22 +44,15 @@ public class Job {
         return columns;
     }
 
-    @Transient
-    public List<JobCondition> getConditions() {
-        return conditions;
-    }
-
-    public String getCondition(String code) {
+    public JobCondition getCondition(String code) {
         for (Iterator<JobCondition> iterator = conditions.iterator(); iterator.hasNext(); ){
             JobCondition jobCondition = iterator.next();
             if (jobCondition.getCode().equals(code)) {
-                return jobCondition.getValue();
+                return jobCondition;
             }
         }
         return null;
     }
-
-    public Job() {}
 
     @Override
     public boolean equals(Object o) {
@@ -152,5 +145,14 @@ public class Job {
 
     public void setJob(boolean job) {
         this.job.set(job);
+    }
+
+    public void setConditions(List<JobCondition> conditions) {
+        this.conditions = conditions;
+    }
+
+    @OneToMany(mappedBy = "job", fetch = FetchType.EAGER)
+    public List<JobCondition> getConditions() {
+        return conditions;
     }
 }

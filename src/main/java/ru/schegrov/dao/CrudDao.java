@@ -12,6 +12,5 @@ public interface CrudDao<T>  {
     void update(T obj) throws Exception;
     void delete(T obj) throws Exception;
     List<T> getAll() throws Exception;
-    List<T> getAllByParentId(int id);
     T getById(int id) throws Exception;
 }

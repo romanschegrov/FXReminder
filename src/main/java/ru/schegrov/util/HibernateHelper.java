@@ -82,7 +82,7 @@ public class HibernateHelper {
     }
 
     public static SessionFactory getSessionFactory () throws Exception{
-        logger.info("start getSessionFactory");
+        logger.trace("start getSessionFactory");
         if (sessionFactory == null || sessionFactory.isClosed()) {
             Exception exception = new Exception("sessionFactory is null or closed");
             logger.error("getSessionFactory error: ", exception);

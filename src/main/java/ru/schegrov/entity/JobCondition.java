@@ -1,30 +1,81 @@
 package ru.schegrov.entity;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+
+import javax.persistence.*;
+
 /**
  * Created by ramon on 10.08.2016.
  */
+@Entity
+@Table(name = "T_FXR_CONDITIONS" /*, uniqueConstraints = {@UniqueConstraint(name = "T_FXR_CONDITIONS", columnNames = {"CODE"})}*/)
 public class JobCondition {
-    private String code;
-    private String value;
+    private SimpleIntegerProperty id = new SimpleIntegerProperty();
+    private SimpleStringProperty code = new SimpleStringProperty("");
+    private SimpleStringProperty value = new SimpleStringProperty("");
+    private Job job;
+
+    public JobCondition() {
+    }
 
     public JobCondition(String code, String value) {
-        this.code = code;
-        this.value = value;
+        this.code.set(code);
+        this.value.set(value);
+    }
+
+    @Id
+    @TableGenerator(
+            name = "GEN",
+            table = "T_FXR_SEQ",
+            pkColumnName = "NAME",
+            pkColumnValue = "CONDITIONS",
+            valueColumnName = "NUM",
+            allocationSize = 1)
+    @GeneratedValue(generator = "GEN")
+    public int getId() {
+        return id.get();
+    }
+
+    public SimpleIntegerProperty idProperty() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id.set(id);
     }
 
     public String getCode() {
+        return code.get();
+    }
+
+    public SimpleStringProperty codeProperty() {
         return code;
     }
 
     public void setCode(String code) {
-        this.code = code;
+        this.code.set(code);
     }
 
     public String getValue() {
+        return value.get();
+    }
+
+    public SimpleStringProperty valueProperty() {
         return value;
     }
 
     public void setValue(String value) {
-        this.value = value;
+        this.value.set(value);
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "JOB_ID", foreignKey = @ForeignKey(name = "T_FXR_CONDITIONS_FKJ"))
+    public Job getJob() {
+        return job;
+    }
+
+    public void setJob(Job job) {
+        this.job = job;
     }
 }

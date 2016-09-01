@@ -12,6 +12,7 @@ import ru.schegrov.entity.Job;
 import ru.schegrov.entity.JobCondition;
 import ru.schegrov.entity.JobTableRow;
 import ru.schegrov.util.JobScheduler;
+import ru.schegrov.util.SchedulerAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +64,7 @@ public class AppModel {
 
         Job rootJob = new Job();
         rootJob.setName(resources.getString("app.accordion.titledpane.jobs.root"));
+        rootJob.setId(0);
         rootJob.setParent_id(0);
 
         TreeItem<Job> rootItem = new TreeItem<>(rootJob, loadImage("/pic/title16.png"));
@@ -79,16 +81,18 @@ public class AppModel {
 
             TreeItem<Job> child = new TreeItem<>(job);
 
-            if (job.isJob()) {
+//            JobCondition timerCondition = job.getCondition("TIMER");
+//            JobCondition sqlCondition = job.getCondition("SQL");
+            if (job.isJob() && job.getCondition("TIMER") != null && job.getCondition("SQL") != null) {
                 child.setGraphic(loadImage("/pic/document.png"));
 
-                job.getConditions().add(new JobCondition("SQL","select created \"Тип\", to_char(created,'dd-mm-yyyy') \"Транзакция\", to_date(to_char(created,'dd-mm-yyyy'),'dd-mm-yyyy') as \"Дата документа\" from dkb.trans_all where value_date>=trunc(sysdate)-60 and  rownum<=round(dbms_random.value*10)"));
-                job.getConditions().add(new JobCondition("TIMER","15"));
+//                job.getConditions().add(new JobCondition("SQL","select created \"Тип\", to_char(created,'dd-mm-yyyy') \"Транзакция\", to_date(to_char(created,'dd-mm-yyyy'),'dd-mm-yyyy') as \"Дата документа\" from dkb.trans_all where value_date>=trunc(sysdate)-60 and  rownum<=round(dbms_random.value*10)"));
+//                job.getConditions().add(new JobCondition("TIMER","15"));
 
                 JobScheduler service = new JobScheduler(job);
                 schedulers.add(service);
                 service.setExecutor(executor);
-                service.setPeriod(Duration.seconds(Double.valueOf(job.getCondition("TIMER"))));        //////seconds!!!!!!!!!!!!!!!
+                service.setPeriod(Duration.seconds(Double.valueOf(job.getCondition("TIMER").getValue())));        //////seconds!!!!!!!!!!!!!!!
                 service.setOnRunning(event -> {
                     logger.info("Running job " + job.getName());
                     child.setGraphic(loadImage("/pic/refresh.png"));
@@ -138,8 +142,33 @@ public class AppModel {
         }
     }
 
-    public void cancelSchedulers(){
-        schedulers.forEach(jobScheduler -> jobScheduler.cancel());
+    public void schedulerAction(SchedulerAction action, Job job){
+        for (JobScheduler scheduler : schedulers) {
+            switch (action){
+                case CANCEL_ALL:
+                    logger.info("cancel scheduler " + scheduler.getJob().getName());
+                    scheduler.cancel();
+                    break;
+                case CANCEL:
+                    if (scheduler.getJob().getId() == job.getId()) {
+                        logger.info("cancel scheduler " + scheduler.getJob().getName());
+                        scheduler.setJob(job);
+                        scheduler.cancel();
+                    }
+                    break;
+                case RESTART:
+                    if (scheduler.getJob().getId() == job.getId()) {
+                        logger.info("restart scheduler " + scheduler.getJob().getName());
+                        scheduler.setPeriod(Duration.seconds(Double.valueOf(job.getCondition("TIMER").getValue())));
+                        scheduler.setJob(job);
+                        scheduler.restart();
+                    }
+                    break;
+                default:
+                    logger.error("default action");
+                    break;
+            }
+        }
     }
 
     public void exit() {

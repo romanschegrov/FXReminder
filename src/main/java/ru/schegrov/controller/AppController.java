@@ -10,14 +10,19 @@ import javafx.util.Callback;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import ru.schegrov.dao.ObjectDao;
+import ru.schegrov.listener.Disconnected;
+import ru.schegrov.listener.JobSelected;
 import ru.schegrov.model.AppModel;
 import ru.schegrov.entity.Job;
 import ru.schegrov.entity.JobTableRow;
 import ru.schegrov.util.AlertHelper;
 import ru.schegrov.util.HibernateHelper;
+import ru.schegrov.util.SchedulerAction;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class AppController implements Initializable {
@@ -28,6 +33,8 @@ public class AppController implements Initializable {
     private AppModel model;
     private ResourceBundle resources;
     private AlertHelper alertError;
+    private List<JobSelected> jobSelectedListeners;
+    private List<Disconnected> disconnectedListeners;
 
     @FXML private Accordion accordion;
     @FXML private TitledPane sign;
@@ -47,13 +54,15 @@ public class AppController implements Initializable {
     @FXML private TabPane tabPane;
     @FXML private Tab tabDetail;
     @FXML private TableView<JobTableRow> table;
-    @FXML private Tab tabProperties;
+    @FXML private Tab tabConditions;
     @FXML private Tab tabUsers;
     @FXML private Tab tabGroups;
 
     public AppController() {
 
         alertError = new AlertHelper(Alert.AlertType.ERROR);
+        jobSelectedListeners = new ArrayList<>();
+        disconnectedListeners = new ArrayList<>();
         logger.info("init");
     }
 
@@ -75,6 +84,17 @@ public class AppController implements Initializable {
         refresh.setGraphic(model.loadImage("/pic/refresh.png"));
         add.setGraphic(model.loadImage("/pic/add.png"));
         del.setGraphic(model.loadImage("/pic/del.png"));
+
+         tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+             if (newValue != null) {
+                 Job job = newValue.getValue();
+                 if (job != null) {
+                     for (JobSelected jobSelected: jobSelectedListeners) {
+                         jobSelected.selectJob(job);
+                     }
+                 }
+             }
+         });
 
         logger.info("initialized");
     }
@@ -108,11 +128,12 @@ public class AppController implements Initializable {
                 accordion.setExpandedPane(jobs);
                 model.fillTreeView();
                 if (HibernateHelper.getConnectedUser().getAdmin()) {
-                    tabProperties.setDisable(false);
                     tabUsers.setDisable(false);
                     tabGroups.setDisable(false);
+                    tabConditions.setDisable(false);
                     initController("/fxml/users.fxml", t -> new UsersTabController(this), tabUsers);
                     initController("/fxml/groups.fxml", t -> new GroupsTabController(this), tabGroups);
+                    initController("/fxml/conditions.fxml", t -> new ConditionsTabController(this), tabConditions);
                 }
                 logger.info("Connected");
             } catch (Exception e) {
@@ -124,13 +145,18 @@ public class AppController implements Initializable {
         } else {
             try {
                 HibernateHelper.closeSessionFactory();
-                model.cancelSchedulers();
+                model.schedulerAction(SchedulerAction.CANCEL_ALL, null);
                 table.getColumns().clear();
                 table.getItems().clear();
                 if (tree.getRoot() != null) {
                     tree.getRoot().getChildren().clear();
                     tree.setRoot(null);
                 }
+                disconnectedListeners.forEach(listener -> listener.disconnect());
+                tabPane.getSelectionModel().select(tabDetail);
+                tabUsers.setDisable(true);
+                tabGroups.setDisable(true);
+                tabConditions.setDisable(true);
                 logger.info("Disconnected");
             } catch (HibernateException e) {
                 error.setText(e.getMessage());
@@ -141,6 +167,9 @@ public class AppController implements Initializable {
 
     public void closeMenu(ActionEvent actionEvent) {
         model.exit();
+    }
+
+    public void refreshContextMenu(ActionEvent actionEvent) {
     }
 
     public void addContextMenu(ActionEvent actionEvent) {
@@ -173,5 +202,13 @@ public class AppController implements Initializable {
 
     public AppModel getModel() {
         return model;
+    }
+
+    public List<JobSelected> getJobSelectedListeners() {
+        return jobSelectedListeners;
+    }
+
+    public List<Disconnected> getDisconnectedListeners() {
+        return disconnectedListeners;
     }
 }

@@ -44,7 +44,7 @@ public class ObjectDao<T> implements CrudDao<T>  {
                     session.save(obj);
                     break;
                 case UPDATE:
-                    session.update(obj);
+                    session.saveOrUpdate(obj);
                     break;
                 case DELETE:
                     session.delete(obj);
@@ -102,30 +102,6 @@ public class ObjectDao<T> implements CrudDao<T>  {
             session.beginTransaction();
             list = session.createCriteria(type)
                     .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-                    .list();
-            session.getTransaction().commit();
-            logger.info("commit");
-        } catch (Exception e){
-            session.getTransaction().rollback();
-            logger.error("rollback", e);
-        } finally {
-            if (session != null && session.isOpen()){
-                session.close();
-                logger.info("session closed");
-            }
-        }
-        return list;
-    }
-
-    @Override
-    public List<T> getAllByParentId(int id) {
-        Session session = null;
-        List list = null;
-        try {
-            session = HibernateHelper.getSessionFactory().openSession();
-            session.beginTransaction();
-            list  = session.createCriteria(type)
-                    .add(Restrictions.eq("parent_id",id))
                     .list();
             session.getTransaction().commit();
             logger.info("commit");

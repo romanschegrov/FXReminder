@@ -104,11 +104,4 @@
         </contextMenu>
 
     </TableView>
-
-    <VBox alignment="BOTTOM_RIGHT">
-        <padding>
-            <Insets top="10" right="0" bottom="0" left="0"/>
-        </padding>
-        <Button text="%app.tabpane.tab.users.button.apply"/>
-    </VBox>
 </VBox>

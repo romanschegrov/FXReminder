@@ -60,6 +60,13 @@ public class UsersTabController implements Initializable {
         udel.setGraphic(parent.getModel().loadImage("/pic/del.png"));
         gdel.setGraphic(parent.getModel().loadImage("/pic/del.png"));
 
+        parent.getDisconnectedListeners().add(() -> {
+           usersTableView.getColumns().clear();
+           usersTableView.getItems().clear();
+           groupsTableView.getColumns().clear();
+           groupsTableView.getItems().clear();
+        });
+
         refreshUsersTable();
         refreshGroupsTable();
 

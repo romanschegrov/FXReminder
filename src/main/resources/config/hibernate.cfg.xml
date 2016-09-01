@@ -14,6 +14,7 @@
     <property name="hbm2ddl.auto">update</property>
 
     <mapping class="ru.schegrov.entity.Job"/>
+    <mapping class="ru.schegrov.entity.JobCondition"/>
     <mapping class="ru.schegrov.entity.User"/>
     <mapping class="ru.schegrov.entity.Group"/>
   </session-factory>

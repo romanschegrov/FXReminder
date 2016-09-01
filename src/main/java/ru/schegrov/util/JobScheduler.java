@@ -22,6 +22,14 @@ public class JobScheduler extends ScheduledService<Job> {
 
     private Job job;
 
+    public Job getJob() {
+        return job;
+    }
+
+    public void setJob(Job job) {
+        this.job = job;
+    }
+
     public JobScheduler(Job job) {
         this.job = job;
         logger.info("init " + job.getName());
@@ -37,7 +45,7 @@ public class JobScheduler extends ScheduledService<Job> {
                 job.getRows().clear();
 
                 JobDao reader = new JobDao();
-                List<Map<String, Object>> sqlRows = reader.getAllRows(job.getCondition("SQL"));
+                List<Map<String, Object>> sqlRows = reader.getAllRows(job.getCondition("SQL").getValue());
                 boolean isFirstRow = true;
                 for (Map<String, Object> sqlRow : sqlRows) {
                     JobTableRow row = new JobTableRow();

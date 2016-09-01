@@ -52,7 +52,7 @@
                         <contextMenu>
                             <ContextMenu>
                                 <items>
-                                    <MenuItem fx:id="refresh" text="%app.accordion.titledpane.jobs.context.refresh" />
+                                    <MenuItem fx:id="refresh" text="%app.accordion.titledpane.jobs.context.refresh" onAction="#refreshContextMenu" />
                                     <SeparatorMenuItem/>
                                     <MenuItem fx:id="add" text="%app.accordion.titledpane.jobs.context.add" onAction="#addContextMenu" />
                                     <MenuItem fx:id="del" text="%app.accordion.titledpane.jobs.context.del" onAction="#delContextMenu"/>
@@ -85,7 +85,7 @@
                         </TableView>
                     </VBox>
                 </Tab>
-                <Tab fx:id="tabProperties" text="%app.tabpane.tab.properties.text" disable="true"/>
+                <Tab fx:id="tabConditions" text="%app.tabpane.tab.properties.text" disable="true"/>
                 <Tab fx:id="tabUsers" text="%app.tabpane.tab.users.text" disable="true"/>
                 <Tab fx:id="tabGroups" text="%app.tabpane.tab.groups.text" disable="true"/>
               </tabs>
