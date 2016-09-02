@@ -38,13 +38,52 @@
                  <ToggleButton fx:id="no" text="%app.tabpane.tab.conditions.no" prefWidth="40" onAction="#toggleButtonAction" toggleGroup="$group"/>
              </HBox>
 
-             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="5"><Label text="%app.tabpane.tab.conditions.min"/></VBox>
-             <ChoiceBox fx:id="min" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="5"><Label text="%app.tabpane.tab.conditions.schedule"/></VBox>
+             <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                 <ToggleButton fx:id="scheduleYes" disabled="true" text="%app.tabpane.tab.conditions.yes" prefWidth="40">
+                 <!--onAction="#toggleScheduleButtonAction"-->
+                     <toggleGroup>
+                         <ToggleGroup fx:id="groupSchedule"/>
+                     </toggleGroup>
+                 </ToggleButton>
+                 <ToggleButton fx:id="scheduleNo" disabled="true" text="%app.tabpane.tab.conditions.no" prefWidth="40" toggleGroup="$groupSchedule"/>
+                 <!--onAction="#toggleScheduleButtonAction"-->
+             </HBox>
 
-             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="6"><Label text="%app.tabpane.tab.conditions.sql"/></VBox>
-             <TextArea fx:id="sql" prefWidth="300" prefRowCount="3" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="6"><Label text="%app.tabpane.tab.conditions.min"/></VBox>
+             <ChoiceBox fx:id="min" disabled="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
 
-             <Button fx:id="apply" text="%app.tabpane.tab.conditions.apply" onAction="#applyAction" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="7"><Label text="%app.tabpane.tab.conditions.sql"/></VBox>
+             <TextArea fx:id="sql" disabled="true" prefWidth="300" prefRowCount="3" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+
+             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="8">
+                 <children>
+                     <Label text="%app.tabpane.tab.conditions.available" />
+                 </children></VBox>
+             <ListView fx:id="availableListView" disabled="false" prefHeight="75" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                 <contextMenu>
+                     <ContextMenu>
+                         <items>
+                             <MenuItem fx:id="aadd" text="%app.tabpane.tab.conditions.context.add" onAction="#addAlignmentContextMenu" />
+                             <MenuItem fx:id="adel" text="%app.tabpane.tab.conditions.context.del" onAction="#delAlignmentContextMenu"/>
+                         </items>
+                     </ContextMenu>
+                 </contextMenu>
+             </ListView>
+
+             <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="9"><Label text="%app.tabpane.tab.conditions.notify" /></VBox>
+             <ListView fx:id="notifyListView" disabled="false" prefHeight="75" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                 <contextMenu>
+                     <ContextMenu>
+                         <items>
+                             <MenuItem fx:id="nadd" text="%app.tabpane.tab.conditions.context.add" onAction="#addNotifyContextMenu" />
+                             <MenuItem fx:id="ndel" text="%app.tabpane.tab.conditions.context.del" onAction="#delNotifyContextMenu"/>
+                         </items>
+                     </ContextMenu>
+                 </contextMenu>
+             </ListView>
+
+             <Button fx:id="apply" onAction="#applyAction" text="%app.tabpane.tab.conditions.apply" GridPane.columnIndex="1" GridPane.rowIndex="10" />
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

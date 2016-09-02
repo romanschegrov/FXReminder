@@ -62,6 +62,12 @@ public class AppModel {
 
     public void fillTreeView(){
 
+        if (tree.getRoot() != null) {
+            tree.getRoot().getChildren().clear();
+            tree.setRoot(null);
+            schedulers.clear();
+        }
+
         Job rootJob = new Job();
         rootJob.setName(resources.getString("app.accordion.titledpane.jobs.root"));
         rootJob.setId(0);
@@ -81,10 +87,17 @@ public class AppModel {
 
             TreeItem<Job> child = new TreeItem<>(job);
 
-//            JobCondition timerCondition = job.getCondition("TIMER");
-//            JobCondition sqlCondition = job.getCondition("SQL");
-            if (job.isJob() && job.getCondition("TIMER") != null && job.getCondition("SQL") != null) {
+            if (job.isJob()) {
                 child.setGraphic(loadImage("/pic/document.png"));
+
+                JobCondition scheduleCondition = job.getCondition("SCHEDULE");
+                if (scheduleCondition == null) break;
+
+                JobCondition timerCondition = job.getCondition("TIMER");
+                if (timerCondition == null && scheduleCondition.getValue().equals("1")) break;
+
+                JobCondition sqlCondition = job.getCondition("SQL");
+                if (sqlCondition == null) break;
 
 //                job.getConditions().add(new JobCondition("SQL","select created \"Тип\", to_char(created,'dd-mm-yyyy') \"Транзакция\", to_date(to_char(created,'dd-mm-yyyy'),'dd-mm-yyyy') as \"Дата документа\" from dkb.trans_all where value_date>=trunc(sysdate)-60 and  rownum<=round(dbms_random.value*10)"));
 //                job.getConditions().add(new JobCondition("TIMER","15"));
@@ -92,7 +105,6 @@ public class AppModel {
                 JobScheduler service = new JobScheduler(job);
                 schedulers.add(service);
                 service.setExecutor(executor);
-                service.setPeriod(Duration.seconds(Double.valueOf(job.getCondition("TIMER").getValue())));        //////seconds!!!!!!!!!!!!!!!
                 service.setOnRunning(event -> {
                     logger.info("Running job " + job.getName());
                     child.setGraphic(loadImage("/pic/refresh.png"));
@@ -108,7 +120,10 @@ public class AppModel {
                     logger.warn("Failed job " + onFailedJob.getName(), event.getSource().getException());
                     child.setGraphic(loadImage("/pic/warning.png"));
                 });
-                service.start();
+                if (scheduleCondition.getValue().equals("1")){
+                    service.setPeriod(Duration.seconds(Double.valueOf(job.getCondition("TIMER").getValue())));        //////seconds!!!!!!!!!!!!!!!
+                    service.start();
+                }
             } else {
                 child.setGraphic(loadImage("/pic/folder.png"));
                 child.setExpanded(true);

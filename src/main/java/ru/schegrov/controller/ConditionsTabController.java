@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import org.apache.log4j.Logger;
 import ru.schegrov.dao.ObjectDao;
 import ru.schegrov.entity.Job;
 import ru.schegrov.entity.JobCondition;
@@ -20,6 +21,8 @@ import java.util.ResourceBundle;
  */
 public class ConditionsTabController implements Initializable {
 
+    private static final Logger logger = Logger.getLogger(ConditionsTabController.class);
+
     private AppController parent;
     private ResourceBundle resources;
     private AlertHelper alertError;
@@ -32,8 +35,18 @@ public class ConditionsTabController implements Initializable {
     @FXML private TextField name;
     @FXML private ToggleButton yes;
     @FXML private ToggleButton no;
+    @FXML private ToggleButton scheduleYes;
+    @FXML private ToggleButton scheduleNo;
     @FXML private ChoiceBox min;
     @FXML private TextArea sql;
+
+    @FXML private ListView<String> availableListView;
+    @FXML private MenuItem aadd;
+    @FXML private MenuItem adel;
+
+    @FXML private ListView<String> notifyListView;
+    @FXML private MenuItem nadd;
+    @FXML private MenuItem ndel;
 
     public ConditionsTabController(AppController parent) {
         this.parent = parent;
@@ -50,9 +63,28 @@ public class ConditionsTabController implements Initializable {
         alertInfo.setTitle(resources.getString("app.alert.title"));
         for (int i = 5; i < 91; i=i+5) min.getItems().add(String.valueOf(i));
 
+        aadd.setGraphic(parent.getModel().loadImage("/pic/add.png"));
+        adel.setGraphic(parent.getModel().loadImage("/pic/del.png"));
+        nadd.setGraphic(parent.getModel().loadImage("/pic/add.png"));
+        ndel.setGraphic(parent.getModel().loadImage("/pic/del.png"));
+
+        scheduleYes.setDisable(true);
+        scheduleNo.setDisable(true);
+        min.setDisable(true);
+        sql.setDisable(true);
+        availableListView.setDisable(true);
+        notifyListView.setDisable(true);
+
         yes.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            min.setDisable(oldValue);
             sql.setDisable(oldValue);
+            scheduleYes.setDisable(oldValue);
+            scheduleNo.setDisable(oldValue);
+            availableListView.setDisable(oldValue);
+            notifyListView.setDisable(oldValue);
+        });
+
+        scheduleYes.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            min.setDisable(oldValue);
         });
 
         parent.getJobSelectedListeners().add(job -> {
@@ -68,17 +100,25 @@ public class ConditionsTabController implements Initializable {
                 JobCondition sqlCondition = job.getCondition("SQL");
                 if (sqlCondition != null) sql.setText(sqlCondition.getValue());
 
-                if (job.isJob()) {
-                    yes.setSelected(true);
+                JobCondition scheduleCondition = job.getCondition("SCHEDULE");
+                if (scheduleCondition == null) {
+                    scheduleYes.setSelected(false);
+                    scheduleNo.setSelected(true);
                 } else {
-                    no.setSelected(true);
+                    scheduleYes.setSelected(scheduleCondition.getValue().equals("1") ? true : false);
+                    scheduleNo.setSelected(scheduleCondition.getValue().equals("0") ? true : false);
                 }
+
+                yes.setSelected(job.isJob() ? true : false);
+                no.setSelected(!job.isJob() ? true : false);
             } else {
                 identifier.setText("");
                 parentIdentifier.setText("");
                 name.setText("");
                 yes.setSelected(false);
+                scheduleYes.setSelected(false);
                 no.setSelected(false);
+                scheduleNo.setSelected(false);
                 min.setValue(null);
                 sql.setText("");
             }
@@ -96,11 +136,6 @@ public class ConditionsTabController implements Initializable {
         } else {
             try {
                 if (job.isJob()) {
-                    if (min.getValue() == null || min.getValue().toString().isEmpty()) {
-                        alertWarning.setContentText(resources.getString("app.alert.conditions.min.isempty"));
-                        alertWarning.show();
-                        return;
-                    }
 
                     if (sql.getText() == null || sql.getText().isEmpty()) {
                         alertWarning.setContentText(resources.getString("app.alert.conditions.sql.isempty"));
@@ -108,12 +143,9 @@ public class ConditionsTabController implements Initializable {
                         return;
                     }
 
-                    updateCondition(job.getCondition("TIMER"),"TIMER",min.getValue().toString());
-                    updateCondition(job.getCondition("SQL"),"SQL",sql.getText());
-
-                    parent.getModel().schedulerAction(SchedulerAction.RESTART, job);
-                } else {
-                    parent.getModel().schedulerAction(SchedulerAction.CANCEL, job);
+                    updateCondition(job.getCondition("SCHEDULE"), "SCHEDULE", scheduleYes.isSelected() ? "1" : "0");
+                    if (scheduleYes.isSelected()) updateCondition(job.getCondition("TIMER"), "TIMER", min.getValue().toString());
+                    updateCondition(job.getCondition("SQL"), "SQL", sql.getText());
                 }
 
                 job.setName(name.getText());
@@ -122,9 +154,13 @@ public class ConditionsTabController implements Initializable {
                 ObjectDao<Job> dao = new ObjectDao<>(Job.class);
                 dao.update(job);
 
+                parent.getModel().schedulerAction(SchedulerAction.CANCEL_ALL, null);
+                parent.getModel().fillTreeView();
+
                 alertInfo.setContentText(resources.getString("app.alert.conditions.saved"));
                 alertInfo.show();
             } catch (Exception e) {
+                logger.error("applyAction error", e);
                 alertError.setContentText(resources.getString("app.alert.conditions.update"));
                 alertError.setException(e);
                 alertError.show();
@@ -143,5 +179,17 @@ public class ConditionsTabController implements Initializable {
             condition.setValue(value);
             dao.update(condition);
         }
+    }
+
+    public void addAlignmentContextMenu(ActionEvent actionEvent) {
+    }
+
+    public void delAlignmentContextMenu(ActionEvent actionEvent) {
+    }
+
+    public void addNotifyContextMenu(ActionEvent actionEvent) {
+    }
+
+    public void delNotifyContextMenu(ActionEvent actionEvent) {
     }
 }
