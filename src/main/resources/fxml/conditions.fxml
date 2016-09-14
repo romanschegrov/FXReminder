@@ -60,19 +60,19 @@
                  <children>
                      <Label text="%app.tabpane.tab.conditions.available" />
                  </children></VBox>
-             <ListView fx:id="availableListView" disabled="false" prefHeight="75" GridPane.columnIndex="1" GridPane.rowIndex="8">
+             <ListView fx:id="availableListView" editable="true" prefHeight="75" GridPane.columnIndex="1" GridPane.rowIndex="8">
                  <contextMenu>
                      <ContextMenu>
                          <items>
-                             <MenuItem fx:id="aadd" text="%app.tabpane.tab.conditions.context.add" onAction="#addAlignmentContextMenu" />
-                             <MenuItem fx:id="adel" text="%app.tabpane.tab.conditions.context.del" onAction="#delAlignmentContextMenu"/>
+                             <MenuItem fx:id="aadd" text="%app.tabpane.tab.conditions.context.add" onAction="#addAvailableContextMenu" />
+                             <MenuItem fx:id="adel" text="%app.tabpane.tab.conditions.context.del" onAction="#delAvailableContextMenu"/>
                          </items>
                      </ContextMenu>
                  </contextMenu>
              </ListView>
 
              <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="9"><Label text="%app.tabpane.tab.conditions.notify" /></VBox>
-             <ListView fx:id="notifyListView" disabled="false" prefHeight="75" GridPane.columnIndex="1" GridPane.rowIndex="9">
+             <ListView fx:id="notifyListView" editable="true" prefHeight="75" GridPane.columnIndex="1" GridPane.rowIndex="9">
                  <contextMenu>
                      <ContextMenu>
                          <items>

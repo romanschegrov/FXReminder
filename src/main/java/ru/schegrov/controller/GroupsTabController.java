@@ -1,6 +1,5 @@
 package ru.schegrov.controller;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -10,13 +9,14 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
-import ru.schegrov.dao.GroupDao;
 import ru.schegrov.dao.ObjectDao;
-import ru.schegrov.dao.UserDao;
 import ru.schegrov.entity.Group;
 import ru.schegrov.entity.User;
 import ru.schegrov.model.GroupsTabModel;
 import ru.schegrov.util.AlertHelper;
+import ru.schegrov.util.ImageHelper;
+
+import javax.jws.soap.SOAPBinding;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -53,12 +53,12 @@ public class GroupsTabController implements Initializable {
         alertError = new AlertHelper(Alert.AlertType.ERROR);
         alertError.setTitle(resources.getString("app.alert.title"));
 
-        urefresh.setGraphic(parent.getModel().loadImage("/pic/refresh.png"));
-        grefresh.setGraphic(parent.getModel().loadImage("/pic/refresh.png"));
-        uadd.setGraphic(parent.getModel().loadImage("/pic/add.png"));
-        gadd.setGraphic(parent.getModel().loadImage("/pic/add.png"));
-        udel.setGraphic(parent.getModel().loadImage("/pic/del.png"));
-        gdel.setGraphic(parent.getModel().loadImage("/pic/del.png"));
+        urefresh.setGraphic(ImageHelper.loadImage("/pic/refresh.png"));
+        grefresh.setGraphic(ImageHelper.loadImage("/pic/refresh.png"));
+        uadd.setGraphic(ImageHelper.loadImage("/pic/add.png"));
+        gadd.setGraphic(ImageHelper.loadImage("/pic/add.png"));
+        udel.setGraphic(ImageHelper.loadImage("/pic/del.png"));
+        gdel.setGraphic(ImageHelper.loadImage("/pic/del.png"));
 
         parent.getDisconnectedListeners().add(() -> {
             groupsTableView.getColumns().clear();
@@ -97,9 +97,9 @@ public class GroupsTabController implements Initializable {
                 try {
                     User oldUser = usersTableView.getSelectionModel().getSelectedItem();
 
-                    UserDao userDao = new UserDao();
+                    ObjectDao<User> userDao = new ObjectDao<User>(User.class);
                     String newUsername = event.getNewValue();
-                    User newUser = userDao.getUserByUsername(newUsername);
+                    User newUser = userDao.getByCode(newUsername);
 
                     ObjectDao<User> userObjectDao = new ObjectDao<>(User.class);
                     oldUser.getGroups().remove(selectedGroup);
@@ -188,9 +188,9 @@ public class GroupsTabController implements Initializable {
             if (!allowedUsers.isEmpty()) {
                 try {
 
-                    UserDao userDao = new UserDao();
+                    ObjectDao<User> userDao = new ObjectDao<>(User.class);
                     String username = allowedUsers.iterator().next();
-                    User user = userDao.getUserByUsername(username);
+                    User user = userDao.getByCode(username);
 
                     ObjectDao<User> userObjectDao = new ObjectDao<>(User.class);
                     user.getGroups().add(selectedGroup);

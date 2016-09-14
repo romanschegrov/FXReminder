@@ -24,6 +24,19 @@ public class JobCondition {
         this.value.set(value);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JobCondition that = (JobCondition) o;
+        return that.getId() == getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return getId();
+    }
+
     @Id
     @TableGenerator(
             name = "GEN",

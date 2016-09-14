@@ -16,9 +16,9 @@ import java.util.*;
 /**
  * Created by ramon on 08.08.2016.
  */
-public class JobScheduler extends ScheduledService<Job> {
+public class JobScheduledService extends ScheduledService<Job> {
 
-    private static final Logger logger = Logger.getLogger(JobScheduler.class);
+    private static final Logger logger = Logger.getLogger(JobScheduledService.class);
 
     private Job job;
 
@@ -30,7 +30,7 @@ public class JobScheduler extends ScheduledService<Job> {
         this.job = job;
     }
 
-    public JobScheduler(Job job) {
+    public JobScheduledService(Job job) {
         this.job = job;
         logger.info("init " + job.getName());
     }

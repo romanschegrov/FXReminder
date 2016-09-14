@@ -94,7 +94,7 @@ public class ObjectDao<T> implements CrudDao<T>  {
     }
 
     @Override
-    public List<T> getAll() {
+    public List<T> getAll(){
         Session session = null;
         List list = null;
         try {
@@ -115,5 +115,29 @@ public class ObjectDao<T> implements CrudDao<T>  {
             }
         }
         return list;
+    }
+
+    @Override
+    public T getByCode(String code) {
+        Session session = null;
+        T obj = null;
+        try {
+            session = HibernateHelper.getSessionFactory().openSession();
+            session.beginTransaction();
+            Criteria criteria = session.createCriteria(type);
+            criteria.add(Restrictions.eq("code",code));
+            obj = (T) criteria.uniqueResult();
+            session.getTransaction().commit();
+            logger.info("commit");
+        } catch (Exception e){
+            session.getTransaction().rollback();
+            logger.error("rollback", e);
+        } finally {
+            if (session != null && session.isOpen()){
+                session.close();
+                logger.info("session closed");
+            }
+        }
+        return obj;
     }
 }

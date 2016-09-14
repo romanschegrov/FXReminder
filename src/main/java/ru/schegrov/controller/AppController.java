@@ -17,6 +17,7 @@ import ru.schegrov.entity.Job;
 import ru.schegrov.entity.JobTableRow;
 import ru.schegrov.util.AlertHelper;
 import ru.schegrov.util.HibernateHelper;
+import ru.schegrov.util.ImageHelper;
 import ru.schegrov.util.SchedulerAction;
 
 import java.io.IOException;
@@ -81,16 +82,16 @@ public class AppController implements Initializable {
         password.setText(HibernateHelper.getPassword());
         signout.setDisable(true);
 
-        refresh.setGraphic(model.loadImage("/pic/refresh.png"));
-        add.setGraphic(model.loadImage("/pic/add.png"));
-        del.setGraphic(model.loadImage("/pic/del.png"));
+        refresh.setGraphic(ImageHelper.loadImage("/pic/refresh.png"));
+        add.setGraphic(ImageHelper.loadImage("/pic/add.png"));
+        del.setGraphic(ImageHelper.loadImage("/pic/del.png"));
 
          tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
              if (newValue != null) {
                  Job job = newValue.getValue();
                  if (job != null) {
                      for (JobSelected jobSelected: jobSelectedListeners) {
-                         jobSelected.selectJob(job);
+                         jobSelected.selectJob(newValue);
                      }
                  }
              }
@@ -144,8 +145,7 @@ public class AppController implements Initializable {
             }
         } else {
             try {
-                HibernateHelper.closeSessionFactory();
-                model.schedulerAction(SchedulerAction.CANCEL_ALL, null);
+                model.getScheduler().cancelAll();
                 table.getColumns().clear();
                 table.getItems().clear();
                 if (tree.getRoot() != null) {
@@ -157,6 +157,7 @@ public class AppController implements Initializable {
                 tabUsers.setDisable(true);
                 tabGroups.setDisable(true);
                 tabConditions.setDisable(true);
+                HibernateHelper.closeSessionFactory();
                 logger.info("Disconnected");
             } catch (HibernateException e) {
                 error.setText(e.getMessage());
@@ -182,7 +183,7 @@ public class AppController implements Initializable {
             try {
                 ObjectDao<Job> job = new ObjectDao<>(Job.class);
                 job.add(newJob);
-                selectedItem.getChildren().add(new TreeItem(newJob, model.loadImage("/pic/folder.png")));
+                selectedItem.getChildren().add(new TreeItem(newJob, ImageHelper.loadImage("/pic/folder.png")));
                 selectedItem.setExpanded(true);
             } catch (Exception e) {
                 logger.error("addUserContextMenu error: ", e);

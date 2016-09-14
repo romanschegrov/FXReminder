@@ -4,26 +4,26 @@ import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import ru.schegrov.entity.Group;
-import ru.schegrov.entity.User;
+import ru.schegrov.entity.JobCondition;
 import ru.schegrov.util.HibernateHelper;
 
 /**
- * Created by ramon on 30.08.2016.
+ * Created by ramon on 13.09.2016.
  */
-public class GroupDao {
+public class ConditionDao {
 
-    private static final Logger logger = Logger.getLogger(GroupDao.class);
+    private static final Logger logger = Logger.getLogger(ConditionDao.class);
 
-    public Group getGroupByCode(String code) {
+    public JobCondition getConditionByCodeAndValue(String code, String value) {
         Session session = null;
-        Group group = null;
+        JobCondition condition = null;
         try {
             session = HibernateHelper.getSessionFactory().openSession();
             session.beginTransaction();
-            Criteria criteria = session.createCriteria(Group.class);
+            Criteria criteria = session.createCriteria(JobCondition.class);
             criteria.add(Restrictions.eq("code",code));
-            group = (Group) criteria.uniqueResult();
+            criteria.add(Restrictions.eq("value",value));
+            condition = (JobCondition) criteria.uniqueResult();
             session.getTransaction().commit();
             logger.info("commit");
         } catch (Exception e){
@@ -35,6 +35,6 @@ public class GroupDao {
                 logger.info("session closed");
             }
         }
-        return group;
+        return condition;
     }
 }

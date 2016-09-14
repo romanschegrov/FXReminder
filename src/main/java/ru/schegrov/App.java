@@ -29,7 +29,7 @@ public class App extends Application {
 
         logger.info("start");
 
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("config.locale", new Locale("en"));
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("config.locale"/*, new Locale("en")*/);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/app.fxml"));
         loader.setResources(resourceBundle);
         loader.setControllerFactory(t -> new AppController());

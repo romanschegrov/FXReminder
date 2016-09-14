@@ -2,18 +2,29 @@ package ru.schegrov.controller;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.ChoiceBoxListCell;
+import javafx.scene.control.cell.ChoiceBoxTableCell;
 import org.apache.log4j.Logger;
+import ru.schegrov.dao.ConditionDao;
 import ru.schegrov.dao.ObjectDao;
+import ru.schegrov.entity.Group;
 import ru.schegrov.entity.Job;
 import ru.schegrov.entity.JobCondition;
+import ru.schegrov.entity.User;
+import ru.schegrov.model.ConditionsTabModel;
 import ru.schegrov.util.AlertHelper;
+import ru.schegrov.util.ImageHelper;
+import ru.schegrov.util.JobSchedulerHelper;
 import ru.schegrov.util.SchedulerAction;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -29,6 +40,9 @@ public class ConditionsTabController implements Initializable {
     private AlertHelper alertWarning;
     private AlertHelper alertInfo;
     private Job job;
+    private TreeItem<Job> jobTreeItem;
+    private JobSchedulerHelper scheduler;
+    private ConditionsTabModel model;
 
     @FXML private TextField identifier;
     @FXML private TextField parentIdentifier;
@@ -50,23 +64,28 @@ public class ConditionsTabController implements Initializable {
 
     public ConditionsTabController(AppController parent) {
         this.parent = parent;
+        scheduler = JobSchedulerHelper.getInstance();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
+
+        model = new ConditionsTabModel(job, resources);
+
         alertError = new AlertHelper(Alert.AlertType.ERROR);
         alertError.setTitle(resources.getString("app.alert.title"));
         alertWarning = new AlertHelper(Alert.AlertType.WARNING);
         alertWarning.setTitle(resources.getString("app.alert.title"));
         alertInfo = new AlertHelper(Alert.AlertType.INFORMATION);
         alertInfo.setTitle(resources.getString("app.alert.title"));
+
         for (int i = 5; i < 91; i=i+5) min.getItems().add(String.valueOf(i));
 
-        aadd.setGraphic(parent.getModel().loadImage("/pic/add.png"));
-        adel.setGraphic(parent.getModel().loadImage("/pic/del.png"));
-        nadd.setGraphic(parent.getModel().loadImage("/pic/add.png"));
-        ndel.setGraphic(parent.getModel().loadImage("/pic/del.png"));
+        aadd.setGraphic(ImageHelper.loadImage("/pic/add.png"));
+        adel.setGraphic(ImageHelper.loadImage("/pic/del.png"));
+        nadd.setGraphic(ImageHelper.loadImage("/pic/add.png"));
+        ndel.setGraphic(ImageHelper.loadImage("/pic/del.png"));
 
         scheduleYes.setDisable(true);
         scheduleNo.setDisable(true);
@@ -77,6 +96,7 @@ public class ConditionsTabController implements Initializable {
 
         yes.selectedProperty().addListener((observable, oldValue, newValue) -> {
             sql.setDisable(oldValue);
+            if (oldValue) scheduleNo.setSelected(oldValue);
             scheduleYes.setDisable(oldValue);
             scheduleNo.setDisable(oldValue);
             availableListView.setDisable(oldValue);
@@ -87,8 +107,9 @@ public class ConditionsTabController implements Initializable {
             min.setDisable(oldValue);
         });
 
-        parent.getJobSelectedListeners().add(job -> {
-            this.job = job;
+        parent.getJobSelectedListeners().add(jobTreeItem -> {
+            this.jobTreeItem = jobTreeItem;
+            this.job = jobTreeItem.getValue();
             if (job.getId()!= 0) {
                 identifier.setText(String.valueOf(job.getId()));
                 parentIdentifier.setText(String.valueOf(job.getParent_id()));
@@ -111,6 +132,28 @@ public class ConditionsTabController implements Initializable {
 
                 yes.setSelected(job.isJob() ? true : false);
                 no.setSelected(!job.isJob() ? true : false);
+
+                ObservableList<String> listAvailable = model.allowedUsersGroups("AVAILABLE");
+                if (!listAvailable.isEmpty()) {
+                    availableListView.setCellFactory(ChoiceBoxListCell.forListView(listAvailable));
+                }
+
+                List<JobCondition> available = job.getConditions("AVAILABLE");
+                if (available != null) {
+                    availableListView.getItems().clear();
+                    available.forEach( a-> availableListView.getItems().add(a.getValue()));
+                }
+
+                ObservableList<String> listNotify = model.allowedUsersGroups("NOTIFY");
+                if (!listNotify.isEmpty()) {
+                    notifyListView.setCellFactory(ChoiceBoxListCell.forListView(listNotify));
+                }
+
+                List<JobCondition> notify = job.getConditions("NOTIFY");
+                if (notify != null) {
+                    notifyListView.getItems().clear();
+                    notify.forEach( n-> notifyListView.getItems().add(n.getValue()));
+                }
             } else {
                 identifier.setText("");
                 parentIdentifier.setText("");
@@ -131,10 +174,8 @@ public class ConditionsTabController implements Initializable {
     }
 
     public void applyAction(ActionEvent actionEvent) {
-        if (job.getId() == 0) {
-            //root item
-        } else {
-            try {
+        try {
+            if (job.getId() != 0) { //not root item
                 if (job.isJob()) {
 
                     if (sql.getText() == null || sql.getText().isEmpty()) {
@@ -142,10 +183,16 @@ public class ConditionsTabController implements Initializable {
                         alertWarning.show();
                         return;
                     }
-
-                    updateCondition(job.getCondition("SCHEDULE"), "SCHEDULE", scheduleYes.isSelected() ? "1" : "0");
-                    if (scheduleYes.isSelected()) updateCondition(job.getCondition("TIMER"), "TIMER", min.getValue().toString());
-                    updateCondition(job.getCondition("SQL"), "SQL", sql.getText());
+                    model.updateCondition(job.getCondition("SQL"), "SQL", sql.getText());
+                    model.updateCondition(job.getCondition("SCHEDULE"), "SCHEDULE", scheduleYes.isSelected() ? "1" : "0");
+                    if (scheduleYes.isSelected()) {
+                        model.updateCondition(job.getCondition("TIMER"), "TIMER", min.getValue().toString());
+                        scheduler.restart(jobTreeItem);
+                    } else {
+                        scheduler.cancel(job);
+                    }
+                } else {
+                    scheduler.cancel(job);
                 }
 
                 job.setName(name.getText());
@@ -154,42 +201,28 @@ public class ConditionsTabController implements Initializable {
                 ObjectDao<Job> dao = new ObjectDao<>(Job.class);
                 dao.update(job);
 
-                parent.getModel().schedulerAction(SchedulerAction.CANCEL_ALL, null);
-                parent.getModel().fillTreeView();
-
                 alertInfo.setContentText(resources.getString("app.alert.conditions.saved"));
                 alertInfo.show();
-            } catch (Exception e) {
-                logger.error("applyAction error", e);
-                alertError.setContentText(resources.getString("app.alert.conditions.update"));
-                alertError.setException(e);
-                alertError.show();
             }
+        } catch (Exception e) {
+            logger.error("applyAction error", e);
+            alertError.setContentText(resources.getString("app.alert.conditions.update"));
+            alertError.setException(e);
+            alertError.show();
         }
     }
 
-    private void updateCondition(JobCondition condition, String code, String value) throws Exception {
-        ObjectDao<JobCondition> dao = new ObjectDao<>(JobCondition.class);
-        if (condition == null) {
-            JobCondition newCondition = new JobCondition(code, value);
-            job.getConditions().add(newCondition);
-            newCondition.setJob(job);
-            dao.update(newCondition);
-        } else {
-            condition.setValue(value);
-            dao.update(condition);
-        }
-    }
-
-    public void addAlignmentContextMenu(ActionEvent actionEvent) {
-    }
-
-    public void delAlignmentContextMenu(ActionEvent actionEvent) {
+    public void addAvailableContextMenu(ActionEvent actionEvent) {
+        model.addCondition("AVAILABLE", availableListView);
     }
 
     public void addNotifyContextMenu(ActionEvent actionEvent) {
+        model.addCondition("NOTIFY", notifyListView);
     }
 
-    public void delNotifyContextMenu(ActionEvent actionEvent) {
+    public void delAvailableContextMenu(ActionEvent actionEvent) {
+        model.delCondition("AVAILABLE", availableListView);
     }
+
+    public void delNotifyContextMenu(ActionEvent actionEvent) { model.delCondition("NOTIFY", availableListView); }
 }

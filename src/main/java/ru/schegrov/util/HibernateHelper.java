@@ -1,18 +1,11 @@
 package ru.schegrov.util;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import ru.schegrov.dao.JobDao;
 import ru.schegrov.dao.ObjectDao;
-import ru.schegrov.dao.UserDao;
-import ru.schegrov.entity.Group;
 import ru.schegrov.entity.User;
-
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class HibernateHelper {
@@ -62,8 +55,8 @@ public class HibernateHelper {
              */
 
 
-            UserDao dao = new UserDao();
-            connectedUser = dao.getUserByUsername(username);
+            ObjectDao<User> dao = new ObjectDao<>(User.class);
+            connectedUser = dao.getByCode(username);
 //            if (connectedUser == null) throw new Exception(resources.getString("app.error.notregistr"));
             if (connectedUser == null){
                 User user = new User();

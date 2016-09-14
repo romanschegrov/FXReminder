@@ -54,6 +54,17 @@ public class Job {
         return null;
     }
 
+    public List<JobCondition> getConditions(String code) {
+        List<JobCondition> list = FXCollections.observableArrayList();
+        for (Iterator<JobCondition> iterator = conditions.iterator(); iterator.hasNext(); ){
+            JobCondition jobCondition = iterator.next();
+            if (jobCondition != null && jobCondition.getCode().equals(code)) {
+                list.add(jobCondition);
+            }
+        }
+        return list;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -83,9 +94,12 @@ public class Job {
     public String toString() {
         StringBuilder builder = new StringBuilder(name.get());
         if (isJob()){
-            builder.append(" (");
-            builder.append(count.get());
-            builder.append(")");
+            JobCondition condition = getCondition("SCHEDULE");
+            if (condition != null && condition.getValue().equals("1")) {
+                builder.append(" (");
+                builder.append(count.get());
+                builder.append(")");
+            }
         }
         return  builder.toString();
     }
