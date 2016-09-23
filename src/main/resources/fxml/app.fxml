@@ -85,7 +85,7 @@
                         </TableView>
                     </VBox>
                 </Tab>
-                <Tab fx:id="tabConditions" text="%app.tabpane.tab.properties.text" disable="true"/>
+                <Tab fx:id="tabConditions" text="%app.tabpane.tab.conditions.text" disable="true"/>
                 <Tab fx:id="tabUsers" text="%app.tabpane.tab.users.text" disable="true"/>
                 <Tab fx:id="tabGroups" text="%app.tabpane.tab.groups.text" disable="true"/>
               </tabs>

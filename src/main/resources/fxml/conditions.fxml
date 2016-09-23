@@ -40,21 +40,21 @@
 
              <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="5"><Label text="%app.tabpane.tab.conditions.schedule"/></VBox>
              <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="5">
-                 <ToggleButton fx:id="scheduleYes" disabled="true" text="%app.tabpane.tab.conditions.yes" prefWidth="40">
+                 <ToggleButton fx:id="scheduleYes" text="%app.tabpane.tab.conditions.yes" prefWidth="40">
                  <!--onAction="#toggleScheduleButtonAction"-->
                      <toggleGroup>
                          <ToggleGroup fx:id="groupSchedule"/>
                      </toggleGroup>
                  </ToggleButton>
-                 <ToggleButton fx:id="scheduleNo" disabled="true" text="%app.tabpane.tab.conditions.no" prefWidth="40" toggleGroup="$groupSchedule"/>
+                 <ToggleButton fx:id="scheduleNo" text="%app.tabpane.tab.conditions.no" prefWidth="40" toggleGroup="$groupSchedule"/>
                  <!--onAction="#toggleScheduleButtonAction"-->
              </HBox>
 
              <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="6"><Label text="%app.tabpane.tab.conditions.min"/></VBox>
-             <ChoiceBox fx:id="min" disabled="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+             <ChoiceBox fx:id="min" GridPane.columnIndex="1" GridPane.rowIndex="6" />
 
              <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="7"><Label text="%app.tabpane.tab.conditions.sql"/></VBox>
-             <TextArea fx:id="sql" disabled="true" prefWidth="300" prefRowCount="3" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+             <TextArea fx:id="sql" prefWidth="300" prefRowCount="3" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="7" />
 
              <VBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="8">
                  <children>

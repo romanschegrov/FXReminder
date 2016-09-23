@@ -105,7 +105,7 @@ public class UsersTabController implements Initializable {
                 try {
                     Group oldGroup = groupsTableView.getSelectionModel().getSelectedItem();
 
-                    ObjectDao<Group> groupDao = new ObjectDao<Group>(Group.class);
+                    ObjectDao<Group> groupDao = new ObjectDao<>(Group.class);
                     String newGroupCode = event.getNewValue();
                     Group newGroup = groupDao.getByCode(newGroupCode);
 

@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
@@ -105,8 +106,12 @@ public class AppController implements Initializable {
             loader = new FXMLLoader(getClass().getResource(fxml));
             loader.setResources(resources);
             loader.setControllerFactory(controllerFactory);
-            pane.setContent(loader.load());
+            Node load = loader.load();
+            pane.setContent(load);
         } catch (IOException e) {
+            alertError.setContentText("");
+            alertError.setException(e);
+            alertError.show();
             logger.error("initController error", e);
         }
     }

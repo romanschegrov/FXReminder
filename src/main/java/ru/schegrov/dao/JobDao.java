@@ -44,14 +44,41 @@ public class JobDao {
 
     public List<Job> getAllByParentId(int id) {
         Session session = null;
-        List list = null;
+        List<Job> list = null;
+        String sql =
+                "SELECT DISTINCT j.*\n" +
+                "  FROM T_FXR_JOBS j, T_FXR_CONDITIONS c\n" +
+                " WHERE 1=1\n" +
+                "   AND j.PARENT_ID = :parent_id\n" +
+                "   AND c.JOB_ID=j.ID\n" +
+                "   AND c.CODE='AVAILABLE'\n" +
+                "   AND c.VALUE =:username\n" +
+                " UNION --доступ к заданиям через группу\n" +
+                "SELECT j.*\n" +
+                "  FROM T_FXR_JOBS j, T_FXR_CONDITIONS c, T_FXR_GROUP g, T_FXR_UG ug, T_FXR_USERS u\n" +
+                " WHERE 1=1\n" +
+                "   AND j.PARENT_ID = :parent_id\n" +
+                "   AND c.JOB_ID=j.id\n" +
+                "   AND c.code='AVAILABLE'\n" +
+                "   AND g.CODE=c.value\n" +
+                "   AND ug.GROUP_ID=g.ID\n" +
+                "   AND u.ID = ug.USER_ID\n" +
+                "   AND u.CODE = :username\n" +
+                " UNION --доступ администраторам ко всем заданиям\n" +
+                "SELECT j.*\n" +
+                "  FROM T_FXR_JOBS j, T_FXR_USERS u\n" +
+                " WHERE 1=1\n" +
+                "   AND j.PARENT_ID = :parent_id\n" +
+                "   AND u.CODE = :username\n" +
+                "   AND u.ADMIN='1'";
         try {
             session = HibernateHelper.getSessionFactory().openSession();
             session.beginTransaction();
-            list  = session.createCriteria(Job.class)
-                    .add(Restrictions.eq("parent_id",id))
-                    .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-                    .list();
+            SQLQuery sqlQuery = session.createSQLQuery(sql);
+            sqlQuery.addEntity(Job.class);
+            sqlQuery.setParameter("username", HibernateHelper.getConnectedUser().getCode());
+            sqlQuery.setParameter("parent_id", id);
+            list  = sqlQuery.list();
             session.getTransaction().commit();
             logger.info("commit");
         } catch (Exception e){

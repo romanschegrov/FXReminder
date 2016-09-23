@@ -30,13 +30,41 @@ public class ConditionsTabModel {
     private ResourceBundle resources;
     private AlertHelper alertError;
 
-    public ConditionsTabModel(Job job /*, ListView<String> availableListView, ListView<String> notifyListView*/ , ResourceBundle resources) {
-        this.job = job;
+    public ConditionsTabModel(ResourceBundle resources) {
+//        this.job = job;
 //        this.availableListView = availableListView;
 //        this.notifyListView = notifyListView;
         this.resources = resources;
         this.alertError = new AlertHelper(Alert.AlertType.ERROR);
         this.alertError.setTitle(resources.getString("app.alert.title"));
+    }
+
+    public void setJob(Job job) {
+        this.job = job;
+    }
+
+    public void editCondition(String code, ListView.EditEvent<String> event) {
+        try {
+            delCondition(code, event.getSource());
+
+            String newValue = event.getNewValue();
+            event.getSource().getItems().add(newValue);
+            event.getSource().getSelectionModel().selectLast();
+
+            JobCondition condition = new JobCondition(code,newValue);
+            condition.setJob(job);
+            ObjectDao<JobCondition> dao = new ObjectDao<>(JobCondition.class);
+            dao.add(condition);
+            job.getConditions().add(condition);
+
+            ObservableList<String> list = allowedUsersGroups(code);
+            event.getSource().setCellFactory(ChoiceBoxListCell.forListView(list));
+        } catch (Exception e) {
+            logger.error("setOnEditCommit error", e);
+            alertError.setContentText(resources.getString("app.alert.conditions.update"));
+            alertError.setException(e);
+            alertError.show();
+        }
     }
 
     public void updateCondition(JobCondition condition, String code, String value) throws Exception {
@@ -86,9 +114,15 @@ public class ConditionsTabModel {
                 dao.add(condition);
 
                 job.getConditions().add(condition);
-
                 view.getItems().add(value);
-                view.setCellFactory(ChoiceBoxListCell.forListView(list));
+
+                list = allowedUsersGroups(code);
+                if (!list.isEmpty()) {
+                    view.setEditable(true);
+                    view.setCellFactory(ChoiceBoxListCell.forListView(list));
+                } else {
+                    view.setEditable(false);
+                }
             } catch (Exception e) {
                 logger.error("addCondition error", e);
                 alertError.setContentText(resources.getString("app.alert.conditions.add"));
@@ -104,12 +138,20 @@ public class ConditionsTabModel {
         if (selectedItem != null) {
             try {
                 ConditionDao dao = new ConditionDao();
-                JobCondition condition = dao.getConditionByCodeAndValue(code,selectedItem);
-                job.getConditions().remove(condition);
+                JobCondition condition = dao.getConditionByCodeAndValue(job, code, selectedItem);
 
                 ObjectDao<JobCondition> objectDao = new ObjectDao<>(JobCondition.class);
                 objectDao.delete(condition);
 
+                job.getConditions().remove(condition);
+
+                ObservableList<String> list = allowedUsersGroups(code);
+                if (!list.isEmpty()) {
+                    view.setEditable(true);
+                    view.setCellFactory(ChoiceBoxListCell.forListView(list));
+                } else {
+                    view.setEditable(false);
+                }
 
                 view.getItems().remove(index);
                 if (index == 0) {

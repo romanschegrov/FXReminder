@@ -5,6 +5,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -70,8 +71,7 @@ public class ConditionsTabController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
-
-        model = new ConditionsTabModel(job, resources);
+        model = new ConditionsTabModel(resources);
 
         alertError = new AlertHelper(Alert.AlertType.ERROR);
         alertError.setTitle(resources.getString("app.alert.title"));
@@ -91,15 +91,23 @@ public class ConditionsTabController implements Initializable {
         scheduleNo.setDisable(true);
         min.setDisable(true);
         sql.setDisable(true);
-        availableListView.setDisable(true);
+        availableListView.setDisable(false);
         notifyListView.setDisable(true);
+
+        availableListView.setOnEditCommit(event -> {
+            model.editCondition("AVAILABLE", event);
+        });
+
+        notifyListView.setOnEditCommit(event -> {
+            model.editCondition("NOTIFY", event);
+        });
 
         yes.selectedProperty().addListener((observable, oldValue, newValue) -> {
             sql.setDisable(oldValue);
             if (oldValue) scheduleNo.setSelected(oldValue);
             scheduleYes.setDisable(oldValue);
             scheduleNo.setDisable(oldValue);
-            availableListView.setDisable(oldValue);
+//            availableListView.setDisable(oldValue);
             notifyListView.setDisable(oldValue);
         });
 
@@ -110,16 +118,20 @@ public class ConditionsTabController implements Initializable {
         parent.getJobSelectedListeners().add(jobTreeItem -> {
             this.jobTreeItem = jobTreeItem;
             this.job = jobTreeItem.getValue();
+            model.setJob(job);
+
             if (job.getId()!= 0) {
                 identifier.setText(String.valueOf(job.getId()));
                 parentIdentifier.setText(String.valueOf(job.getParent_id()));
                 name.setText(job.getName());
 
                 JobCondition timerCondition = job.getCondition("TIMER");
-                if (timerCondition != null) min.getSelectionModel().select(timerCondition.getValue());
+                if (timerCondition == null) min.getSelectionModel().selectFirst();
+                else min.getSelectionModel().select(timerCondition.getValue());
 
                 JobCondition sqlCondition = job.getCondition("SQL");
-                if (sqlCondition != null) sql.setText(sqlCondition.getValue());
+                if (sqlCondition == null) sql.setText("");
+                else sql.setText(sqlCondition.getValue());
 
                 JobCondition scheduleCondition = job.getCondition("SCHEDULE");
                 if (scheduleCondition == null) {
@@ -134,24 +146,20 @@ public class ConditionsTabController implements Initializable {
                 no.setSelected(!job.isJob() ? true : false);
 
                 ObservableList<String> listAvailable = model.allowedUsersGroups("AVAILABLE");
-                if (!listAvailable.isEmpty()) {
-                    availableListView.setCellFactory(ChoiceBoxListCell.forListView(listAvailable));
-                }
+                if (!listAvailable.isEmpty()) availableListView.setCellFactory(ChoiceBoxListCell.forListView(listAvailable));
 
                 List<JobCondition> available = job.getConditions("AVAILABLE");
+                availableListView.getItems().clear();
                 if (available != null) {
-                    availableListView.getItems().clear();
                     available.forEach( a-> availableListView.getItems().add(a.getValue()));
                 }
 
                 ObservableList<String> listNotify = model.allowedUsersGroups("NOTIFY");
-                if (!listNotify.isEmpty()) {
-                    notifyListView.setCellFactory(ChoiceBoxListCell.forListView(listNotify));
-                }
+                if (!listNotify.isEmpty()) notifyListView.setCellFactory(ChoiceBoxListCell.forListView(listNotify));
 
                 List<JobCondition> notify = job.getConditions("NOTIFY");
+                notifyListView.getItems().clear();
                 if (notify != null) {
-                    notifyListView.getItems().clear();
                     notify.forEach( n-> notifyListView.getItems().add(n.getValue()));
                 }
             } else {
