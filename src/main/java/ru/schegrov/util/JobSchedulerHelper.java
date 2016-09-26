@@ -1,14 +1,18 @@
 package ru.schegrov.util;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.TreeItem;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.log4j.Logger;
+import org.controlsfx.control.Notifications;
 import ru.schegrov.entity.Job;
 import ru.schegrov.entity.JobCondition;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -22,15 +26,17 @@ public class JobSchedulerHelper {
     private List<JobScheduledService> schedulers;
     private Executor executor;
     private static JobSchedulerHelper instance;
+    private ResourceBundle resources;
 
-    public static JobSchedulerHelper getInstance() {
+    public static JobSchedulerHelper getInstance(ResourceBundle resources) {
         if (instance == null) {
-            instance = new JobSchedulerHelper();
+            instance = new JobSchedulerHelper(resources);
         }
         return instance;
     }
 
-    private JobSchedulerHelper() {
+    private JobSchedulerHelper(ResourceBundle resources) {
+        this.resources = resources;
         schedulers = new ArrayList<>();
         executor = Executors.newFixedThreadPool(2,
                 new ThreadFactory() {
@@ -69,7 +75,14 @@ public class JobSchedulerHelper {
                 Job onSucceededJob = (Job) event.getSource().getValue();
                 logger.info("Succeeded job: " + onSucceededJob.getName() + ", Count row: "+ onSucceededJob.getRows().size());
                 item.setGraphic(ImageHelper.loadImage("/pic/document.png"));
-                //refreshTable(onSucceededJob);   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+                List<String> list = onSucceededJob.getNotifyConditions();
+                if (list != null){
+                    if (list.contains(HibernateHelper.getConnectedUser().getCode())){
+                        NotificationHelper notification = new NotificationHelper(resources, job, (Stage) item.getGraphic().getScene().getWindow());
+                        notification.notify(Pos.BOTTOM_RIGHT);
+                    }
+                }
             });
             scheduler.setOnFailed(event -> {
                 Job onFailedJob = (Job) event.getSource().getValue();

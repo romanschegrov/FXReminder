@@ -8,9 +8,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.ChoiceBoxListCell;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
+import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import ru.schegrov.dao.ConditionDao;
 import ru.schegrov.dao.ObjectDao;
@@ -19,10 +21,7 @@ import ru.schegrov.entity.Job;
 import ru.schegrov.entity.JobCondition;
 import ru.schegrov.entity.User;
 import ru.schegrov.model.ConditionsTabModel;
-import ru.schegrov.util.AlertHelper;
-import ru.schegrov.util.ImageHelper;
-import ru.schegrov.util.JobSchedulerHelper;
-import ru.schegrov.util.SchedulerAction;
+import ru.schegrov.util.*;
 
 import java.net.URL;
 import java.util.List;
@@ -65,12 +64,12 @@ public class ConditionsTabController implements Initializable {
 
     public ConditionsTabController(AppController parent) {
         this.parent = parent;
-        scheduler = JobSchedulerHelper.getInstance();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
+        scheduler = JobSchedulerHelper.getInstance(resources);
         model = new ConditionsTabModel(resources);
 
         alertError = new AlertHelper(Alert.AlertType.ERROR);

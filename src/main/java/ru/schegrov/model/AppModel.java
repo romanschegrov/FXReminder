@@ -1,20 +1,28 @@
 package ru.schegrov.model;
 
+import javafx.animation.FadeTransition;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.ObjectProperty;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.log4j.Logger;
 import ru.schegrov.dao.JobDao;
 import ru.schegrov.entity.Job;
 import ru.schegrov.entity.JobCondition;
 import ru.schegrov.entity.JobTableRow;
-import ru.schegrov.util.ImageHelper;
-import ru.schegrov.util.JobScheduledService;
-import ru.schegrov.util.JobSchedulerHelper;
-import ru.schegrov.util.SchedulerAction;
+import ru.schegrov.util.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +46,11 @@ public class AppModel {
 //    private List<JobScheduledService> schedulers;
     private JobSchedulerHelper scheduler;
 
-    public AppModel(TreeView<Job> tree, TableView<JobTableRow> table) {
+    public AppModel(TreeView<Job> tree, TableView<JobTableRow> table, ResourceBundle resources) {
         this.tree = tree;
         this.table = table;
-        scheduler = JobSchedulerHelper.getInstance();
+        this.resources = resources;
+        scheduler = JobSchedulerHelper.getInstance(resources);
         this.tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 refreshTable(newValue.getValue());
@@ -50,8 +59,40 @@ public class AppModel {
         logger.info("init");
     }
 
-    public void setResources(ResourceBundle resources) {
-        this.resources = resources;
+    public void setupClearButtonField(final TextField inputField, ObjectProperty<Node> rightProperty) {
+        inputField.getStyleClass().add("clearable-field");
+        Region clearButton = new Region();
+        clearButton.getStyleClass().addAll(new String[]{"graphic"});
+        StackPane clearButtonPane = new StackPane(new Node[]{clearButton});
+        clearButtonPane.getStyleClass().addAll(new String[]{"clear-button"});
+        clearButtonPane.setOpacity(0.0D);
+        clearButtonPane.setCursor(Cursor.DEFAULT);
+        clearButtonPane.setOnMouseReleased((e) -> {
+            inputField.clear();
+        });
+        clearButtonPane.managedProperty().bind(inputField.editableProperty());
+        clearButtonPane.visibleProperty().bind(inputField.editableProperty());
+        rightProperty.set(clearButtonPane);
+        final FadeTransition fader = new FadeTransition(Duration.millis(350.0D), clearButtonPane);
+        fader.setCycleCount(1);
+        inputField.textProperty().addListener(new InvalidationListener() {
+            public void invalidated(Observable arg0) {
+                String text = inputField.getText();
+                boolean isTextEmpty = text == null || text.isEmpty();
+                boolean isButtonVisible = fader.getNode().getOpacity() > 0.0D;
+                if(isTextEmpty && isButtonVisible) {
+                    this.setButtonVisible(false);
+                } else if(!isTextEmpty && !isButtonVisible) {
+                    this.setButtonVisible(true);
+                }
+
+            }
+            private void setButtonVisible(boolean visible) {
+                fader.setFromValue(visible?0.0D:1.0D);
+                fader.setToValue(visible?1.0D:0.0D);
+                fader.play();
+            }
+        });
     }
 
     public void fillTreeView(){

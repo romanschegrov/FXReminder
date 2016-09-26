@@ -44,6 +44,22 @@ public class Job {
         return columns;
     }
 
+    @Transient
+    public List<String> getNotifyConditions(){
+        List<String> list = new ArrayList<>();
+        for (JobCondition condition : getConditions("NOTIFY")){
+            /**
+             * идем по условиям NOTIFY
+             * если код этого условия совпадает с пользователем который приконектился к базе то выходим
+             * в противном случае надо запросить группу по данному коду
+             * если это действительно группа то запросить пользователей этой группыы
+             * если в списке пользователей данной группы есть наш пользователь, то true
+             */
+        }
+
+        return list;
+    }
+
     public JobCondition getCondition(String code) {
         for (Iterator<JobCondition> iterator = conditions.iterator(); iterator.hasNext(); ){
             JobCondition jobCondition = iterator.next();

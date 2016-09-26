@@ -9,6 +9,8 @@ import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import org.apache.log4j.Logger;
+import org.controlsfx.control.textfield.CustomPasswordField;
+import org.controlsfx.control.textfield.CustomTextField;
 import org.hibernate.HibernateException;
 import ru.schegrov.dao.ObjectDao;
 import ru.schegrov.listener.Disconnected;
@@ -44,8 +46,8 @@ public class AppController implements Initializable {
     @FXML private Text error;
     @FXML private Button signin;
     @FXML private Button signout;
-    @FXML private TextField username;
-    @FXML private TextField password;
+    @FXML private CustomTextField username;
+    @FXML private CustomPasswordField password;
 
     @FXML private TitledPane jobs;
     @FXML private TreeView<Job> tree;
@@ -72,15 +74,16 @@ public class AppController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
         alertError.setTitle(resources.getString("app.alert.title"));
-
-        model = new AppModel(tree, table);
-        model.setResources(resources);
+        model = new AppModel(tree, table, resources);
 
         accordion.setExpandedPane(sign);
 
         url.setText(HibernateHelper.getUrl());
-        username.setText(HibernateHelper.getUsername());
-        password.setText(HibernateHelper.getPassword());
+        model.setupClearButtonField(username, username.rightProperty());
+username.setText(HibernateHelper.getUsername());
+
+        model.setupClearButtonField(password, password.rightProperty());
+password.setText(HibernateHelper.getPassword());
         signout.setDisable(true);
 
         refresh.setGraphic(ImageHelper.loadImage("/pic/refresh.png"));

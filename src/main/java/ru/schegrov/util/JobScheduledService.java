@@ -3,9 +3,11 @@ package ru.schegrov.util;
 
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
+import javafx.geometry.Pos;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import ru.schegrov.dao.JobDao;
 import ru.schegrov.entity.Job;
