@@ -90,7 +90,7 @@ password.setText(HibernateHelper.getPassword());
         add.setGraphic(ImageHelper.loadImage("/pic/add.png"));
         del.setGraphic(ImageHelper.loadImage("/pic/del.png"));
 
-         tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
              if (newValue != null) {
                  Job job = newValue.getValue();
                  if (job != null) {
@@ -140,6 +140,8 @@ password.setText(HibernateHelper.getPassword());
                     tabUsers.setDisable(false);
                     tabGroups.setDisable(false);
                     tabConditions.setDisable(false);
+                    add.setDisable(false);
+                    del.setDisable(false);
                     initController("/fxml/users.fxml", t -> new UsersTabController(this), tabUsers);
                     initController("/fxml/groups.fxml", t -> new GroupsTabController(this), tabGroups);
                     initController("/fxml/conditions.fxml", t -> new ConditionsTabController(this), tabConditions);

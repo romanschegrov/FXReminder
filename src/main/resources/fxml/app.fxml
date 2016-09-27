@@ -56,8 +56,8 @@
                                 <items>
                                     <MenuItem fx:id="refresh" text="%app.accordion.titledpane.jobs.context.refresh" onAction="#refreshContextMenu" />
                                     <SeparatorMenuItem/>
-                                    <MenuItem fx:id="add" text="%app.accordion.titledpane.jobs.context.add" onAction="#addContextMenu" />
-                                    <MenuItem fx:id="del" text="%app.accordion.titledpane.jobs.context.del" onAction="#delContextMenu"/>
+                                    <MenuItem fx:id="add" text="%app.accordion.titledpane.jobs.context.add" onAction="#addContextMenu" disable="true"/>
+                                    <MenuItem fx:id="del" text="%app.accordion.titledpane.jobs.context.del" onAction="#delContextMenu" disable="true"/>
                                 </items>
                             </ContextMenu>
                         </contextMenu>
