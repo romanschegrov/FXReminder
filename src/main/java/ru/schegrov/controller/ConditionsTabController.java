@@ -231,5 +231,5 @@ public class ConditionsTabController implements Initializable {
         model.delCondition("AVAILABLE", availableListView);
     }
 
-    public void delNotifyContextMenu(ActionEvent actionEvent) { model.delCondition("NOTIFY", availableListView); }
+    public void delNotifyContextMenu(ActionEvent actionEvent) { model.delCondition("NOTIFY", notifyListView); }
 }

@@ -2,8 +2,11 @@ package ru.schegrov.entity;
 
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
+import ru.schegrov.dao.ObjectDao;
+import ru.schegrov.util.HibernateHelper;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -42,43 +45,6 @@ public class Job {
     @Transient
     public ObservableList<TableColumn <JobTableRow, String> > getColumns() {
         return columns;
-    }
-
-    @Transient
-    public List<String> getNotifyConditions(){
-        List<String> list = new ArrayList<>();
-        for (JobCondition condition : getConditions("NOTIFY")){
-            /**
-             * идем по условиям NOTIFY
-             * если код этого условия совпадает с пользователем который приконектился к базе то выходим
-             * в противном случае надо запросить группу по данному коду
-             * если это действительно группа то запросить пользователей этой группыы
-             * если в списке пользователей данной группы есть наш пользователь, то true
-             */
-        }
-
-        return list;
-    }
-
-    public JobCondition getCondition(String code) {
-        for (Iterator<JobCondition> iterator = conditions.iterator(); iterator.hasNext(); ){
-            JobCondition jobCondition = iterator.next();
-            if (jobCondition.getCode().equals(code)) {
-                return jobCondition;
-            }
-        }
-        return null;
-    }
-
-    public List<JobCondition> getConditions(String code) {
-        List<JobCondition> list = FXCollections.observableArrayList();
-        for (Iterator<JobCondition> iterator = conditions.iterator(); iterator.hasNext(); ){
-            JobCondition jobCondition = iterator.next();
-            if (jobCondition != null && jobCondition.getCode().equals(code)) {
-                list.add(jobCondition);
-            }
-        }
-        return list;
     }
 
     @Override
@@ -177,12 +143,33 @@ public class Job {
         this.job.set(job);
     }
 
+    @OneToMany(mappedBy = "job", fetch = FetchType.EAGER)
+    public List<JobCondition> getConditions() {
+        return conditions;
+    }
+
     public void setConditions(List<JobCondition> conditions) {
         this.conditions = conditions;
     }
 
-    @OneToMany(mappedBy = "job", fetch = FetchType.EAGER)
-    public List<JobCondition> getConditions() {
-        return conditions;
+    public List<JobCondition> getConditions(String code) {
+        List<JobCondition> list = FXCollections.observableArrayList();
+        for (Iterator<JobCondition> iterator = conditions.iterator(); iterator.hasNext(); ){
+            JobCondition jobCondition = iterator.next();
+            if (jobCondition != null && jobCondition.getCode().equals(code)) {
+                list.add(jobCondition);
+            }
+        }
+        return list;
+    }
+
+    public JobCondition getCondition(String code) {
+        for (Iterator<JobCondition> iterator = conditions.iterator(); iterator.hasNext(); ){
+            JobCondition jobCondition = iterator.next();
+            if (jobCondition.getCode().equals(code)) {
+                return jobCondition;
+            }
+        }
+        return null;
     }
 }

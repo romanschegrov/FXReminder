@@ -6,8 +6,11 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.Notifications;
+import ru.schegrov.dao.ObjectDao;
+import ru.schegrov.entity.Group;
 import ru.schegrov.entity.Job;
 import ru.schegrov.entity.JobCondition;
+import ru.schegrov.entity.User;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -76,12 +79,29 @@ public class JobSchedulerHelper {
                 logger.info("Succeeded job: " + onSucceededJob.getName() + ", Count row: "+ onSucceededJob.getRows().size());
                 item.setGraphic(ImageHelper.loadImage("/pic/document.png"));
 
-                List<String> list = onSucceededJob.getNotifyConditions();
-                if (list != null){
-                    if (list.contains(HibernateHelper.getConnectedUser().getCode())){
-                        NotificationHelper notification = new NotificationHelper(resources, job, (Stage) item.getGraphic().getScene().getWindow());
-                        notification.notify(Pos.BOTTOM_RIGHT);
+                String connectedUser = HibernateHelper.getConnectedUser().getCode();
+                boolean notify = false;
+                notifed:
+                for (JobCondition condition : job.getConditions("NOTIFY")){
+                    if (condition.getValue().equals(connectedUser)){
+                        notify = true;
+                        break notifed;
                     }
+                    ObjectDao<Group> objectDao = new ObjectDao(Group.class);
+                    Group group = objectDao.getByCode(condition.getValue());
+                    if (group != null) {
+                        for (User user : group.getUsers()){
+                            if (user.getCode().equals(connectedUser)){
+                                notify = true;
+                                break notifed;
+                            }
+                        }
+                    }
+                }
+
+                if (notify){
+                    NotificationHelper notification = new NotificationHelper(resources, job, (Stage) item.getGraphic().getScene().getWindow());
+                    notification.notify(Pos.BOTTOM_RIGHT);
                 }
             });
             scheduler.setOnFailed(event -> {
