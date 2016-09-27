@@ -1,5 +1,6 @@
 package ru.schegrov.controller;
 
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,10 +19,7 @@ import ru.schegrov.listener.JobSelected;
 import ru.schegrov.model.AppModel;
 import ru.schegrov.entity.Job;
 import ru.schegrov.entity.JobTableRow;
-import ru.schegrov.util.AlertHelper;
-import ru.schegrov.util.HibernateHelper;
-import ru.schegrov.util.ImageHelper;
-import ru.schegrov.util.SchedulerAction;
+import ru.schegrov.util.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -39,6 +37,7 @@ public class AppController implements Initializable {
     private AlertHelper alertError;
     private List<JobSelected> jobSelectedListeners;
     private List<Disconnected> disconnectedListeners;
+    private JobSchedulerHelper scheduler;
 
     @FXML private Accordion accordion;
     @FXML private TitledPane sign;
@@ -74,6 +73,7 @@ public class AppController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
         alertError.setTitle(resources.getString("app.alert.title"));
+        scheduler = JobSchedulerHelper.getInstance(resources);
         model = new AppModel(tree, table, resources);
 
         accordion.setExpandedPane(sign);
@@ -179,6 +179,10 @@ password.setText(HibernateHelper.getPassword());
     }
 
     public void refreshContextMenu(ActionEvent actionEvent) {
+        TreeItem<Job> selectedItem = tree.getSelectionModel().getSelectedItem();
+        if (selectedItem != null && selectedItem.getValue().getId() != 0) {
+            scheduler.restart(selectedItem);
+        }
     }
 
     public void addContextMenu(ActionEvent actionEvent) {
@@ -204,9 +208,29 @@ password.setText(HibernateHelper.getPassword());
     }
 
     public void delContextMenu(ActionEvent actionEvent) {
-        alertError.setContentText(resources.getString("app.alert.jobs.del"));
-//        alertError.setException(e);
-        alertError.show();
+        TreeItem<Job> selectedItem = tree.getSelectionModel().getSelectedItem();
+        int selectedIndex = tree.getSelectionModel().getSelectedIndex();
+        if (selectedItem != null && selectedItem.getChildren().isEmpty()) {
+            try {
+                Job job = selectedItem.getValue();
+
+                if (job.isJob()) scheduler.cancel(job);
+
+                ObjectDao<Job> dao = new ObjectDao<>(Job.class);
+                dao.delete(job);
+                selectedItem.getParent().getChildren().remove(selectedItem);
+                if (selectedIndex == 0)
+                    tree.getSelectionModel().selectFirst();
+                else
+                    tree.getSelectionModel().select(--selectedIndex);
+            } catch (Exception e) {
+                logger.error("delUserContextMenu error: ", e);
+
+                alertError.setContentText(resources.getString("app.alert.jobs.del"));
+                alertError.setException(e);
+                alertError.show();
+            }
+        }
     }
 
     public AppModel getModel() {

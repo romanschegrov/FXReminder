@@ -143,7 +143,7 @@ public class Job {
         this.job.set(job);
     }
 
-    @OneToMany(mappedBy = "job", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "job", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     public List<JobCondition> getConditions() {
         return conditions;
     }
