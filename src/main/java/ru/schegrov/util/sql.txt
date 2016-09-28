@@ -1,8 +1,1 @@
-grant select, insert, delete, update on T_FXR_CONDITIONS to public;
-grant select, insert, delete, update on T_FXR_GROUP to public;
-grant select, insert, delete, update on T_FXR_JOBS to public;
-grant select, insert, delete, update on T_FXR_SEQ to public;
-grant select, insert, delete, update on T_FXR_UG to public;
-grant select, insert, delete, update on T_FXR_USERS to public;
-
 select created "Тип", to_char(created,'dd-mm-yyyy') "Транзакция", to_date(to_char(created,'dd-mm-yyyy'),'dd-mm-yyyy') as "Дата документа" from dkb.trans_all where value_date>=trunc(sysdate)-60 and  rownum<=round(dbms_random.value*10)

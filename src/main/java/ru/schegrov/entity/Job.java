@@ -77,7 +77,7 @@ public class Job {
         StringBuilder builder = new StringBuilder(name.get());
         if (isJob()){
             JobCondition condition = getCondition("SCHEDULE");
-            if (condition != null && condition.getValue().equals("1")) {
+            if (condition != null && condition.getValue().equals("1") && count.get() > 0) {
                 builder.append(" (");
                 builder.append(count.get());
                 builder.append(")");

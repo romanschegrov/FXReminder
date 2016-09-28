@@ -47,25 +47,27 @@ public class HibernateHelper {
             configure.setProperty("hibernate.connection.password", password);
             sessionFactory = configure.buildSessionFactory();
 
+
             /**
              * В этом месте уже есть все новые созданные таблицы
              * тут надо запускать скрипты по миграции и добавлению необходимых данных
              * На сейчас вижу, что должен быть минимум один пользователь (с флагом Адиин) в таблице пользователей
              * под которым мы подключаемся в первый раз. Он создает других пользователей, группы, задания...
-             */
+            */
 
+            FlywayHelper.getInstance(url, username, password).migrate();
 
             ObjectDao<User> dao = new ObjectDao<>(User.class);
             connectedUser = dao.getByCode(username);
-//            if (connectedUser == null) throw new Exception(resources.getString("app.error.notregistr"));
-            if (connectedUser == null){
-                User user = new User();
-                user.setCode(username);
-                user.setAdmin(true);
-                ObjectDao<User> objectDao = new ObjectDao<>(User.class);
-                objectDao.add(user);
-                connectedUser = user;
-            }
+            if (connectedUser == null) throw new Exception(resources.getString("app.error.notregistr"));
+//            if (connectedUser == null){
+//                User user = new User();
+//                user.setCode(username);
+//                user.setAdmin(true);
+//                ObjectDao<User> objectDao = new ObjectDao<>(User.class);
+//                objectDao.add(user);
+//                connectedUser = user;
+//            }
 
         } catch (Exception e){
             logger.error("buildSessionFactory error: ", e);

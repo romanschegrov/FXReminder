@@ -41,7 +41,7 @@ public class JobSchedulerHelper {
     private JobSchedulerHelper(ResourceBundle resources) {
         this.resources = resources;
         schedulers = new ArrayList<>();
-        executor = Executors.newFixedThreadPool(2,
+        executor = Executors.newFixedThreadPool(5,
                 new ThreadFactory() {
                     @Override
                     public Thread newThread(Runnable r) {
@@ -110,7 +110,7 @@ public class JobSchedulerHelper {
                 item.setGraphic(ImageHelper.loadImage("/pic/warning.png"));
             });
             if (scheduleCondition.getValue().equals("1")){
-                scheduler.setPeriod(Duration.seconds(Double.valueOf(job.getCondition("TIMER").getValue())));        //////seconds!!!!!!!!!!!!!!!
+                scheduler.setPeriod(Duration.minutes(Double.valueOf(job.getCondition("TIMER").getValue())));
                 scheduler.start();
             }
         } else {

@@ -70,6 +70,7 @@ public class JobCondition {
         this.code.set(code);
     }
 
+    @Column(length = 4000)
     public String getValue() {
         return value.get();
     }
