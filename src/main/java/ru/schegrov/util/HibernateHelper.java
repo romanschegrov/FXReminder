@@ -58,7 +58,7 @@ public class HibernateHelper {
             FlywayHelper.getInstance(url, username, password).migrate();
 
             ObjectDao<User> dao = new ObjectDao<>(User.class);
-            connectedUser = dao.getByCode(username);
+            connectedUser = dao.getByCode(username.toUpperCase());
             if (connectedUser == null) throw new Exception(resources.getString("app.error.notregistr"));
 //            if (connectedUser == null){
 //                User user = new User();

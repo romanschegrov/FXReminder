@@ -1,1 +1,0 @@
-select created "Тип", to_char(created,'dd-mm-yyyy') "Транзакция", to_date(to_char(created,'dd-mm-yyyy'),'dd-mm-yyyy') as "Дата документа" from dkb.trans_all where value_date>=trunc(sysdate)-60 and  rownum<=round(dbms_random.value*10)
